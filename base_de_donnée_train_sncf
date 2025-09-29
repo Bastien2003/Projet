@@ -1,1 +1,2 @@
-https://data.sncf.com/explore/embed/dataset/regularite-mensuelle-tgv-aqst/table/?sort=-service&q=montpellier&refine.gare_depart=MONTPELLIER
+gare de depart montpellier : https://data.sncf.com/explore/embed/dataset/regularite-mensuelle-tgv-aqst/table/?sort=-service&q=montpellier&refine.gare_depart=MONTPELLIER
+gare d'arrivé montpellier : https://data.sncf.com/explore/embed/dataset/regularite-mensuelle-tgv-aqst/table/?sort=gare_arrivee&q=montpellier&refine.gare_arrivee=MONTPELLIER
