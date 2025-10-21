@@ -1,3 +1,8 @@
+---
+title: "Planification du projet"
+format: html
+---
+
 ```{mermaid}
 gantt
     dateFormat  YYYY-MM-DD
@@ -11,4 +16,5 @@ gantt
     Afficher les graphes/carte       :des4, after des3, 3d
     Exporter les graphes/carte       :des5, after des4, 3d
     Mise en page du site             :des6, after des5, 7d
+
 
