@@ -36,6 +36,12 @@ Résultats espérés :
 
 ![](graph_date_retard_.JPG)
 
+![Carte interactive](carte_interactive_.JPG)
+
+![Graphique causes retard](graph_cause_retard_.JPG)
+
+![Graphique dates retard](graph_date_retard_.JPG)
+
 Ces visualisations nécessitent l'utilisation de **pandas** et d'autres bibliothèques Python.
 
 ### Technologies / Packages utilisés
@@ -78,6 +84,7 @@ gantt
     Exporter les graphes/carte       :des5, after des4, 3d
     Mise en forme du site             :des6, after des5, 7d
 ```
+
 
 
 
