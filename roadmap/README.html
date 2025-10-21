@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Bastien, Néo, Sofia, Mohammed">
 
-<title>readme</title>
+<title>le retard des trains en région Occitanie</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -35,6 +36,9 @@ ul.task-list li input[type="checkbox"] {
 <script src="README_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="README_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="README_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="README_files/libs/quarto-diagram/mermaid.min.js"></script>
+<script src="README_files/libs/quarto-diagram/mermaid-init.js"></script>
+<link href="README_files/libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
 </head>
@@ -45,10 +49,144 @@ ul.task-list li input[type="checkbox"] {
 
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">le retard des trains en région Occitanie</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Bastien, Néo, Sofia, Mohammed </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="projet" class="level1">
+<h1>projet</h1>
+<p><strong>GitHub repository</strong>: https://github.com/Bastien2003/Projet.git</p>
+<p><strong>Group composition</strong>:<br>
+- Étudiant 1 (Numéro étudiant)<br>
+- Étudiant 2 (Numéro étudiant)<br>
+- Étudiant 3 (Numéro étudiant)<br>
+- Étudiant 4 (Numéro étudiant)</p>
+<hr>
+<section id="description-du-projet" class="level2">
+<h2 class="anchored" data-anchor-id="description-du-projet">1. Description du projet</h2>
+<p>Notre projet consiste à analyser le retard moyen des trains/Ter/Intercités dans les gares de la région Occitanie. Nous allons nous focaliser sur les gares des grandes villes de la région, comme Montpellier, Toulouse, Carcassonne, Béziers…</p>
+<p>Nous souhaitons présenter notre analyse à l’aide de plusieurs graphiques et d’une carte interactive.</p>
+<section id="créations-prévues" class="level3">
+<h3 class="anchored" data-anchor-id="créations-prévues">Créations prévues</h3>
+<ol type="1">
+<li><strong>Carte interactive</strong> des plus grandes gares sélectionnées. En cliquant sur une gare, on obtient le nom et le nombre de voyageurs par an.</li>
+<li><strong>Graphique en barres</strong> montrant le retard moyen des trains selon le jour de la semaine, l’heure du jour, le mois ou l’année pour chaque gare sélectionnée (~10 gares).</li>
+<li><strong>Graphique en barres</strong> mettant en relation le nombre moyen de retards avec les différentes causes.</li>
+</ol>
+<p>Résultats espérés :</p>
+<p><img src="carte_interactive_.JPG" class="img-fluid"></p>
+<p><img src="graph_cause_retard_.JPG" class="img-fluid"></p>
+<p><img src="graph_date_retard_.JPG" class="img-fluid"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="carte_interactive_.JPG" class="img-fluid figure-img"></p>
+<figcaption>Carte interactive</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="graph_cause_retard_.JPG" class="img-fluid figure-img"></p>
+<figcaption>Graphique causes retard</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="graph_date_retard_.JPG" class="img-fluid figure-img"></p>
+<figcaption>Graphique dates retard</figcaption>
+</figure>
+</div>
+<p>Ces visualisations nécessitent l’utilisation de <strong>pandas</strong> et d’autres bibliothèques Python.</p>
+</section>
+<section id="technologies-packages-utilisés" class="level3">
+<h3 class="anchored" data-anchor-id="technologies-packages-utilisés">Technologies / Packages utilisés</h3>
+<ul>
+<li><strong>Python</strong> : <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>seaborn</code>, <code>folium</code> (pour cartes interactives)<br>
+</li>
+<li><strong>Quarto</strong> : génération de rapports et visualisations<br>
+</li>
+<li><strong>HTML</strong> : création du site web</li>
+</ul>
+</section>
+<section id="architecture-minimale" class="level3">
+<h3 class="anchored" data-anchor-id="architecture-minimale">Architecture minimale</h3>
+<ul>
+<li><strong>Dossier <code>data/</code></strong> : fichiers de données brutes<br>
+</li>
+<li><strong>Dossier <code>scripts/</code></strong> : scripts de traitement des données<br>
+</li>
+<li><strong>Dossier <code>roadmap/</code></strong> : README.qmd<br>
+</li>
+<li><strong>Fichiers principaux</strong> :
+<ul>
+<li><code>edition.py</code> : fonctions de création des cartes et graphiques<br>
+</li>
+<li><code>visualization.py</code> : fonctions de visualisation<br>
+</li>
+<li><code>rapport.txt</code> : analyse et interprétation des données</li>
+</ul></li>
+</ul>
+</section>
+<section id="pipeline-de-codage" class="level3">
+<h3 class="anchored" data-anchor-id="pipeline-de-codage">Pipeline de codage</h3>
+<ol type="1">
+<li>Charger les données<br>
+</li>
+<li>Nettoyer et transformer les données<br>
+</li>
+<li>Produire les visualisations<br>
+</li>
+<li>Documenter les résultats dans les rapports</li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="roadmap-diagramme-de-gantt" class="level2">
+<h2 class="anchored" data-anchor-id="roadmap-diagramme-de-gantt">2. Roadmap / Diagramme de Gantt</h2>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">gantt
+    dateFormat  YYYY-MM-DD
+    title       Roadmap du projet
+
+    section Développement
+    Créer le site                    :des1, 2025-10-27, 7d
+    Créer la carte interactive       :des2, after des1, 7d
+    Créer les deux graphiques           :des3, after des2, 7d
+    Afficher les graphes/carte       :des4, after des3, 3d
+    Exporter les graphes/carte       :des5, after des4, 3d
+    Mise en forme du site             :des6, after des5, 7d
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+</section>
 
 </main>
 <!-- /main column -->
