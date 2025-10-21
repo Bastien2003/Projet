@@ -6,7 +6,7 @@ format: html
 
 # projet
 
-**GitHub repository**: https://github.com/tonnomutilisateur/Projet  
+**GitHub repository**: https://github.com/Bastien2003/Projet.git  
 
 **Group composition**:  
 - Étudiant 1 (Numéro étudiant)  
@@ -78,6 +78,7 @@ gantt
     Exporter les graphes/carte       :des5, after des4, 3d
     Mise en forme du site             :des6, after des5, 7d
 ```
+
 
 
 
