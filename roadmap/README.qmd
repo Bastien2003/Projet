@@ -30,11 +30,11 @@ Nous souhaitons présenter notre analyse à l'aide de plusieurs graphiques et d'
 
 Résultats espérés : 
 
-!\[](carte_interactive_.JPG)
+![](carte_interactive_.JPG)
 
-!\[](graph_cause_retard_.JPG)
+![](graph_cause_retard_.JPG)
 
-!\[](graph_date_retard_.JPG)
+![](graph_date_retard_.JPG)
 
 Ces visualisations nécessitent l'utilisation de **pandas** et d'autres bibliothèques Python.
 
@@ -78,6 +78,7 @@ gantt
     Exporter les graphes/carte       :des5, after des4, 3d
     Mise en forme du site             :des6, after des5, 7d
 ```
+
 
 
 
