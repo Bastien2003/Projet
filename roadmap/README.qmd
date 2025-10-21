@@ -1,20 +1,84 @@
 ---
-title: "Planification du projet"
+title: "le retard des trains en région Occitanie"
+author: "Bastien, Néo, Sofia, Mohammed"
 format: html
 ---
+
+# projet
+
+**GitHub repository**: https://github.com/tonnomutilisateur/Projet  
+
+**Group composition**:  
+- Étudiant 1 (Numéro étudiant)  
+- Étudiant 2 (Numéro étudiant)  
+- Étudiant 3 (Numéro étudiant)  
+- Étudiant 4 (Numéro étudiant)
+
+---
+
+## 1. Description du projet
+
+Notre projet consiste à analyser le retard moyen des trains/Ter/Intercités dans les gares de la région Occitanie. Nous allons nous focaliser sur les gares des grandes villes de la région, comme Montpellier, Toulouse, Carcassonne, Béziers… 
+
+Nous souhaitons présenter notre analyse à l'aide de plusieurs graphiques et d'une carte interactive.
+
+### Créations prévues
+
+1. **Carte interactive** des plus grandes gares sélectionnées. En cliquant sur une gare, on obtient le nom et le nombre de voyageurs par an.
+2. **Graphique en barres** montrant le retard moyen des trains selon le jour de la semaine, l'heure du jour, le mois ou l'année pour chaque gare sélectionnée (~10 gares).
+3. **Graphique en barres** mettant en relation le nombre moyen de retards avec les différentes causes.
+
+Résultats espérés : 
+
+!\[](images/carte_interactive_.JPG)
+
+!\[](images/graphe_cause_retard_.JPG)
+
+!\[](images/graphe_date_retard_.JPG)
+
+Ces visualisations nécessitent l'utilisation de **pandas** et d'autres bibliothèques Python.
+
+### Technologies / Packages utilisés
+
+- **Python** : `pandas`, `numpy`, `matplotlib`, `seaborn`, `folium` (pour cartes interactives)  
+- **Quarto** : génération de rapports et visualisations  
+- **HTML** : création du site web
+
+### Architecture minimale
+
+- **Dossier `data/`** : fichiers de données brutes  
+- **Dossier `scripts/`** : scripts de traitement des données  
+- **Dossier `roadmap/`** : README.qmd  
+- **Fichiers principaux** :  
+  - `edition.py` : fonctions de création des cartes et graphiques  
+  - `visualization.py` : fonctions de visualisation  
+  - `rapport.txt` : analyse et interprétation des données  
+
+### Pipeline de codage
+
+1. Charger les données  
+2. Nettoyer et transformer les données  
+3. Produire les visualisations  
+4. Documenter les résultats dans les rapports  
+
+---
+
+## 2. Roadmap / Diagramme de Gantt
 
 ```{mermaid}
 gantt
     dateFormat  YYYY-MM-DD
-    title       Planification du projet
-    excludes    weekends
+    title       Roadmap du projet
 
     section Développement
     Créer le site                    :des1, 2025-10-27, 7d
     Créer la carte interactive       :des2, after des1, 7d
-    Créer les deux graphes           :des3, after des2, 7d
+    Créer les deux graphiques           :des3, after des2, 7d
     Afficher les graphes/carte       :des4, after des3, 3d
     Exporter les graphes/carte       :des5, after des4, 3d
-    Mise en page du site             :des6, after des5, 7d
+    Mise en forme du site             :des6, after des5, 7d
+```
+
+
 
 
