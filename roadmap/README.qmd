@@ -1,0 +1,13 @@
+```{mermaid}
+gantt
+    dateFormat  YYYY-MM-DD
+    title       Planification du projet
+    excludes    weekends
+
+    section Développement
+    Créer le site                    :des1, 2025-10-27, 7d
+    Créer la carte interactive       :des2, after des1, 7d
+    Créer les deux graphes           :des3, after des2, 7d
+    Afficher les graphes/carte       :des4, after des3, 3d
+    Exporter les graphes/carte       :des5, after des4, 3d
+    Mise en page du site             :des6, after des5, 7d
