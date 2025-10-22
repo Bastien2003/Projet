@@ -10,7 +10,7 @@ format: html
 
 **Group composition**:  
 - Ben-Atmane Sofia (Numéro étudiant : 22405102)  
-- Étudiant 2 (Numéro étudiant)  
+- Regnat Néo (Numéro étudiant : 22119548)  
 - Étudiant 3 (Numéro étudiant)  
 - Étudiant 4 (Numéro étudiant)
 
@@ -77,19 +77,19 @@ gantt
     title       Roadmap du projet
 
     section Développement
-    Choix du sujet d'etude           :des1, 17-09,1d
-    Recherche de bases de données    :des2, 24-09,3w 
-    compte rendu de l'avancé du projet :des3, 24-10,2d
+    Choix du sujet d'etude(Bastien)           :des1, 17-09,1d
+    Recherche de bases de données(Néo)    :des2, 24-09,3w 
+    compte rendu de l'avancé du projet(Sofia) :des3, 24-10,2d
     section creation
-    Créer le site                    :des4, 27-10, 7d
-    Créer la carte interactive       :des5, after des4, 7d
-    Créer les deux graphiques        :des6, after des5, 7d
-    Afficher les graphes/carte       :des7, after des6, 3d
-    Exporter les graphes/carte       :des8, after des7, 3d
-    Mise en forme du site            :des9, after des8, 7d
+    Créer le site(Mohamed)                    :des4, 27-10, 7d
+    Créer la carte interactive(Néo)       :des5, after des4, 7d
+    Créer les deux graphiques(Sofia)        :des6, after des5, 7d
+    Afficher les graphes/carte(Mohamed)       :des7, after des6, 3d
+    Exporter les graphes/carte(Bastien)       :des8, after des7, 3d
+    Mise en forme du site(Sofia)            :des9, after des8, 7d
     section présentation
-    Rendu du projet final            :des10, 10-12,1d
-    Oral                             :des11, 12-12,1d
+    Rendu du projet final(Bastien)            :des10, 10-12,1d
+    Oral(Tout le monde)                             :des11, 12-12,1d
 ```
 
 
