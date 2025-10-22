@@ -30,12 +30,6 @@ Nous souhaitons présenter notre analyse à l'aide de plusieurs graphiques et d'
 
 Résultats espérés : 
 
-![](carte_interactive_.JPG)
-
-![](graph_cause_retard_.JPG)
-
-![](graph_date_retard_.JPG)
-
 ![Carte interactive](carte_interactive_.JPG)
 
 ![Graphique causes retard](graph_cause_retard_.JPG)
@@ -73,16 +67,20 @@ Ces visualisations nécessitent l'utilisation de **pandas** et d'autres biblioth
 
 ```{mermaid}
 gantt
-    dateFormat  YYYY-MM-DD
+    dateFormat  DD-MM
     title       Roadmap du projet
 
     section Développement
-    Créer le site                    :des1, 2025-10-27, 7d
-    Créer la carte interactive       :des2, after des1, 7d
-    Créer les deux graphiques           :des3, after des2, 7d
-    Afficher les graphes/carte       :des4, after des3, 3d
-    Exporter les graphes/carte       :des5, after des4, 3d
-    Mise en forme du site             :des6, after des5, 7d
+    Choix du sujet d'etude           :des1, 17-09,1d
+    Recherche de bases de données    :des2, 24-09,3w 
+    Créer le site                    :des3, 27-10, 7d
+    Créer la carte interactive       :des4, after des3, 7d
+    Créer les deux graphiques        :des5, after des4, 7d
+    Afficher les graphes/carte       :des6, after des5, 3d
+    Exporter les graphes/carte       :des7, after des6, 3d
+    Mise en forme du site            :des8, after des7, 7d
+    Rendu du projet final            :des9, 10-12,1d
+    Oral                             :des10, 12-12,1d
 ```
 
 
