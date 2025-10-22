@@ -1,5 +1,5 @@
 ---
-title: "le retard des trains en région Occitanie"
+title: "le retard moyen des trains en région Occitanie"
 author: "Bastien, Néo, Sofia, Mohammed"
 format: html
 ---
@@ -9,7 +9,7 @@ format: html
 **GitHub repository**: https://github.com/Bastien2003/Projet.git  
 
 **Group composition**:  
-- Étudiant 1 (Numéro étudiant)  
+- Ben-Atmane Sofia (Numéro étudiant : 22405102)  
 - Étudiant 2 (Numéro étudiant)  
 - Étudiant 3 (Numéro étudiant)  
 - Étudiant 4 (Numéro étudiant)
@@ -18,9 +18,16 @@ format: html
 
 ## 1. Description du projet
 
-Notre projet consiste à analyser le retard moyen des trains/Ter/Intercités dans les gares de la région Occitanie. Nous allons nous focaliser sur les gares des grandes villes de la région, comme Montpellier, Toulouse, Carcassonne, Béziers… 
+Notre projet vise à analyser les retards moyens des trains (TER et Intercités) circulant dans les gares de la région Occitanie.
+L’objectif est de mieux comprendre la répartition et les causes des retards selon différents critères : le lieu, le moment de la journée ou encore la période de l’année.
 
-Nous souhaitons présenter notre analyse à l'aide de plusieurs graphiques et d'une carte interactive.
+Nous concentrons notre étude sur les principales gares de la région, telles que Montpellier, Toulouse, Carcassonne ou Béziers, afin d’obtenir une vision représentative du trafic ferroviaire en Occitanie.
+
+Les résultats de cette analyse seront présentés à travers plusieurs visualisations interactives, notamment :
+
+une carte interactive permettant de localiser les gares et d’afficher des informations associées (comme le nombre de voyageurs par an) ;
+
+des graphiques illustrant les tendances des retards selon le jour, l’heure ou le mois, ainsi que les principales causes de ces retards.
 
 ### Créations prévues
 
@@ -30,13 +37,12 @@ Nous souhaitons présenter notre analyse à l'aide de plusieurs graphiques et d'
 
 Résultats espérés : 
 
-![Carte interactive](carte_interactive_.JPG)
+![Carte interactive des gares de la region Occitanie](carte_interactive_.JPG)
 
-![Graphique causes retard](graph_cause_retard_.JPG)
+![Graphique mettant en lien les retars a leur cause](graph_cause_retard_.JPG)
 
-![Graphique dates retard](graph_date_retard_.JPG)
+![Graphique mettant en correlation du temps de retard par rapport a la date](graph_date_retard_.JPG)
 
-Ces visualisations nécessitent l'utilisation de **pandas** et d'autres bibliothèques Python.
 
 ### Technologies / Packages utilisés
 
