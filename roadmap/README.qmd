@@ -73,14 +73,17 @@ gantt
     section Développement
     Choix du sujet d'etude           :des1, 17-09,1d
     Recherche de bases de données    :des2, 24-09,3w 
-    Créer le site                    :des3, 27-10, 7d
-    Créer la carte interactive       :des4, after des3, 7d
-    Créer les deux graphiques        :des5, after des4, 7d
-    Afficher les graphes/carte       :des6, after des5, 3d
-    Exporter les graphes/carte       :des7, after des6, 3d
-    Mise en forme du site            :des8, after des7, 7d
-    Rendu du projet final            :des9, 10-12,1d
-    Oral                             :des10, 12-12,1d
+    compte rendu de l'avancé du projet :des3, 24-10,2d
+    section creation
+    Créer le site                    :des4, 27-10, 7d
+    Créer la carte interactive       :des5, after des4, 7d
+    Créer les deux graphiques        :des6, after des5, 7d
+    Afficher les graphes/carte       :des7, after des6, 3d
+    Exporter les graphes/carte       :des8, after des7, 3d
+    Mise en forme du site            :des9, after des8, 7d
+    section présentation
+    Rendu du projet final            :des10, 10-12,1d
+    Oral                             :des11, 12-12,1d
 ```
 
 
