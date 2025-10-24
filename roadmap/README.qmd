@@ -11,7 +11,7 @@ format: html
 **Group composition**:  
 - Ben-Atmane Sofia (Numéro étudiant : 22405102)  
 - Regnat Néo (Numéro étudiant : 22119548)  
-- Maggi Bastien (Numéro étudiant)  
+- Maggi Bastien (Numéro étudiant : 22510856)  
 - Étudiant 4 (Numéro étudiant)
 
 ---
@@ -91,6 +91,7 @@ gantt
     Rendu du projet final(Bastien)            :des10, 10-12,1d
     Oral(Tout le monde)                             :des11, 12-12,1d
 ```
+
 
 
 
