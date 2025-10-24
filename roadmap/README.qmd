@@ -1,5 +1,5 @@
 ---
-title: "le retard moyen des trains en région Occitanie"
+title: "le retard moyen des trains (en région Occitanie)"
 author: "Bastien, Néo, Sofia, Mohammed"
 format: html
 ---
@@ -18,7 +18,7 @@ format: html
 
 ## 1. Description du projet
 
-Notre projet vise à analyser les retards moyens des trains (TER et Intercités) circulant dans les gares de la région Occitanie.
+Notre projet vise à analyser les retards moyens des trains circulant dans les gares (de la région Occitanie).
 L’objectif est de mieux comprendre la répartition et les causes des retards selon différents critères : le lieu, le moment de la journée ou encore la période de l’année.
 
 Nous concentrons notre étude sur les principales gares de la région, telles que Montpellier, Toulouse, Carcassonne ou Béziers, afin d’obtenir une vision représentative du trafic ferroviaire en Occitanie.
@@ -91,6 +91,7 @@ gantt
     Rendu du projet final(Bastien)            :des10, 10-12,1d
     Oral(Tout le monde)                             :des11, 12-12,1d
 ```
+
 
 
 
