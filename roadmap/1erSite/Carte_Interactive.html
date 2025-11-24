@@ -4,100 +4,157 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carte interactive — Occitanie</title>
-
-    <!-- Leaflet CSS (sans intégrité pour éviter le blocage) -->
-    <link 
-        rel="stylesheet" 
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
-
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <style>
-        /* La carte doit avoir une hauteur */
-        #map {
-            height: 100vh;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            margin: 0;
-            padding: 0;
-        }
+        #map { height: 100vh; width: 100%; margin: 0; padding: 0; }
+        body { margin: 0; padding: 0; }
+        .popup-chart { width: 600px; height: 400px; display: block; }
+        .leaflet-popup-content { max-height: 450px; overflow-y: auto; }
     </style>
 </head>
-
 <body>
+<div id="map"></div>
 
-    <div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Leaflet JS (sans intégrité) -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map = L.map('map').setView([43.6, 2.2], 7);
 
-    <script>
-        // Initialisation de la carte
-        const map = L.map('map').setView([43.6, 2.2], 7);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap'
+}).addTo(map);
 
-        // Tuiles OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
+const geojsonUrl = "https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/regions-version-simplifiee.geojson";
+const styleOccitanie = { color: "#d62828", weight: 2, fillOpacity: 0 };
 
-        // URL du GeoJSON des régions françaises (version allégée)
-        const geojsonUrl = "https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/regions-version-simplifiee.geojson";
+fetch(geojsonUrl)
+    .then(r => r.json())
+    .then(data => {
+        const occitanie = data.features.filter(f => f.properties.nom === "Occitanie");
+        const occ = { type: "FeatureCollection", features: occitanie };
+        const layer = L.geoJSON(occ, { style: styleOccitanie }).addTo(map);
+        map.fitBounds(layer.getBounds());
+    });
 
-        // Style
-        const styleOccitanie = {
-            color: "#d62828",   // contour rouge
-            weight: 2,
-            fillOpacity: 0      // pas de couleur de remplissage
-        };
-
-        fetch(geojsonUrl)
-            .then(r => r.json())
-            .then(data => {
-                const occitanie = data.features.filter(
-                    f => f.properties.nom === "Occitanie"
-                );
-
-                const occ = {
-                    type: "FeatureCollection",
-                    features: occitanie
-                };
-
-                const layer = L.geoJSON(occ, {
-                    style: styleOccitanie,
-                    onEachFeature: (feature, layer) => {
-                        layer.bindPopup("<b>Région : Occitanie</b>");
-                    }
-                }).addTo(map);
-
-                map.fitBounds(layer.getBounds());
-                // --- Ajout des gares ---
+// Liste des gares et fichiers CSV correspondants
 const gares = [
-    { nom: "Albi-Ville", lat: 43.9283, lon: 2.1460 },
-    { nom: "Bayonne", lat: 43.4926, lon: -1.4747 },
-    { nom: "Béziers", lat: 43.3443, lon: 3.2158 },
-    { nom: "Cerbère", lat: 42.4428, lon: 3.1649 },
-    { nom: "Latour-de-Carol", lat: 42.4530, lon: 1.8635 },
-    { nom: "Montpellier Saint-Roch", lat: 43.6045, lon: 3.8780 },
-    { nom: "Nîmes", lat: 43.8340, lon: 4.3601 },
-    { nom: "Perpignan", lat: 42.6976, lon: 2.8911 },
-    { nom: "Tarbes", lat: 43.2320, lon: 0.0713 },
-    { nom: "Toulouse-Matabiau", lat: 43.6110, lon: 1.4553 }
+    { nom: "Albi", lat: 43.9283, lon: 2.1460, csv: "albi_retard_arrivee_intercites.csv" },
+    { nom: "Bayonne", lat: 43.4926, lon: -1.4747, csv: "bayonne_retard_arrivee_intercites.csv" },
+    { nom: "Béziers", lat: 43.3443, lon: 3.2158, csv: "beziers_retard_arrivee_intercites.csv" },
+    { nom: "Cerbère", lat: 42.4428, lon: 3.1649, csv: "cerbere_retard_arrivee_intercites.csv" },
+    { nom: "Latour-de-Carol", lat: 42.4530, lon: 1.8635, csv: "latourdecarol_retard_arrivee_intercites.csv" },
+    { nom: "Montpellier Saint-Roch", lat: 43.6045, lon: 3.8780, csv: "montpellier_retard_arrivee+depart_tgv.csv" },
+    { nom: "Nîmes", lat: 43.8340, lon: 4.3601, csv: "nimes_retard_arrivee_intercites.csv" },
+    { nom: "Perpignan", lat: 42.6976, lon: 2.8911, csv: "perpignan_retard_arrivee_intercites.csv" },
+    { nom: "Tarbes", lat: 43.2320, lon: 0.0713, csv: "tarbes_retard_arrivee_intercites.csv" },
+    { nom: "Toulouse-Matabiau", lat: 43.6110, lon: 1.4553, csv: "toulouse_retard_arrivee_intercites.csv" }
 ];
 
-gares.forEach(g => {
-    L.marker([g.lat, g.lon])
-        .addTo(map)
-        .bindPopup(`<b>Gare :</b> ${g.nom}`);
-});
-            })
-            .catch(err => console.error("Erreur GeoJSON :", err));
-    </script>
+const garesExclues = ["Montpellier Saint-Roch", "Perpignan", "Toulouse-Matabiau"];
 
+// Fonction pour créer le graphique classique
+async function showChart(marker, csvFile) {
+    const popupContent = `<canvas class="popup-chart"></canvas>`;
+    marker.bindPopup(popupContent, { maxWidth: 650 }).openPopup();
+
+    const data = await fetch(csvFile)
+        .then(r => r.text())
+        .then(text => {
+            const lines = text.split('\n');
+            const headers = lines[0].split(';');
+            return lines.slice(1).filter(l => l.trim() !== '').map(line => {
+                const cols = line.split(';');
+                const obj = {};
+                headers.forEach((h,i)=> obj[h]=cols[i]);
+                return obj;
+            });
+        });
+
+    const labels = data.map(row => row["Date"]);
+    const values = data.map(row => parseFloat(row["Nombre de trains ayant circulé"]));
+
+    const ctx = marker.getPopup().getElement().querySelector("canvas").getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets: [{ label: 'Trains ayant circulé', data: values, borderColor: 'rgba(54,162,235,1)', backgroundColor:'rgba(54,162,235,0.2)', fill:true }]},
+        options: { 
+            responsive:true,
+            plugins:{ legend:{position:'top'}, title:{display:true,text:`Nombre de trains à ${marker.options.title}`}}, 
+            scales:{ x:{title:{display:true,text:'Date'}}, y:{title:{display:true,text:'Nombre de trains'}} } 
+        }
+    });
+}
+
+// Ajouter les marqueurs pour les gares classiques
+gares.forEach(g => {
+    if (garesExclues.includes(g.nom)) return;
+    const marker = L.marker([g.lat, g.lon], { title: g.nom }).addTo(map);
+    marker.on('click', () => showChart(marker, g.csv));
+});
+
+// Ajouter les marqueurs pour les gares particulières
+gares.filter(g => garesExclues.includes(g.nom)).forEach(g => {
+    const marker = L.marker([g.lat, g.lon], { title: g.nom }).addTo(map);
+    marker.on('click', async () => {
+        const popupContent = `<canvas class="popup-chart"></canvas>`;
+        marker.bindPopup(popupContent, { maxWidth: 650 }).openPopup();
+
+        const data = await fetch(g.csv)
+            .then(r => r.text())
+            .then(text => {
+                const lines = text.split('\n');
+                const headers = lines[0].split(';');
+                return lines.slice(1).filter(l => l.trim() !== '').map(line => {
+                    const cols = line.split(';');
+                    const obj = {};
+                    headers.forEach((h,i)=> obj[h]=cols[i]);
+                    return obj;
+                });
+            });
+
+        const labels = data.map(row => row["Date"]);
+        const datasets = [];
+
+        if (g.nom === "Montpellier Saint-Roch") {
+            datasets.push({
+                label: "Trains arrivés",
+                data: data.map(row => parseFloat(row["Arrivée"] || 0)),
+                borderColor: 'rgba(54,162,235,1)',
+                backgroundColor: 'rgba(54,162,235,0.2)',
+                fill: true
+            });
+            datasets.push({
+                label: "Trains partis",
+                data: data.map(row => parseFloat(row["Départ"] || 0)),
+                borderColor: 'rgba(255,99,132,1)',
+                backgroundColor: 'rgba(255,99,132,0.2)',
+                fill: true
+            });
+        } else {
+            datasets.push({
+                label: "Trains ayant circulé",
+                data: data.map(row => parseFloat(row["Nombre de trains ayant circulé"] || 0)),
+                borderColor: 'rgba(75,192,192,1)',
+                backgroundColor: 'rgba(75,192,192,0.2)',
+                fill: true
+            });
+        }
+
+        const ctx = marker.getPopup().getElement().querySelector("canvas").getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: { labels, datasets },
+            options: { 
+                responsive:true,
+                plugins:{ legend:{position:'top'}, title:{display:true,text:`Nombre de trains à ${marker.options.title}`}}, 
+                scales:{ x:{title:{display:true,text:'Date'}}, y:{title:{display:true,text:'Nombre de trains'}} } 
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>
-
 
