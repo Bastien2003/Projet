@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carte interactive — Occitanie</title>
+
+    <!-- Leaflet CSS (sans intégrité pour éviter le blocage) -->
+    <link 
+        rel="stylesheet" 
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+        /* La carte doit avoir une hauteur */
+        #map {
+            height: 100vh;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="map"></div>
+
+    <!-- Leaflet JS (sans intégrité) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Initialisation de la carte
+        const map = L.map('map').setView([43.6, 2.2], 7);
+
+        // Tuiles OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // URL du GeoJSON des régions françaises (version allégée)
+        const geojsonUrl = "https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/regions-version-simplifiee.geojson";
+
+        // Style
+        const styleOccitanie = {
+            color: "#d62828",   // contour rouge
+            weight: 2,
+            fillOpacity: 0      // pas de couleur de remplissage
+        };
+
+        fetch(geojsonUrl)
+            .then(r => r.json())
+            .then(data => {
+                const occitanie = data.features.filter(
+                    f => f.properties.nom === "Occitanie"
+                );
+
+                const occ = {
+                    type: "FeatureCollection",
+                    features: occitanie
+                };
+
+                const layer = L.geoJSON(occ, {
+                    style: styleOccitanie,
+                    onEachFeature: (feature, layer) => {
+                        layer.bindPopup("<b>Région : Occitanie</b>");
+                    }
+                }).addTo(map);
+
+                map.fitBounds(layer.getBounds());
+                // --- Ajout des gares ---
+const gares = [
+    { nom: "Albi-Ville", lat: 43.9283, lon: 2.1460 },
+    { nom: "Bayonne", lat: 43.4926, lon: -1.4747 },
+    { nom: "Béziers", lat: 43.3443, lon: 3.2158 },
+    { nom: "Cerbère", lat: 42.4428, lon: 3.1649 },
+    { nom: "Latour-de-Carol", lat: 42.4530, lon: 1.8635 },
+    { nom: "Montpellier Saint-Roch", lat: 43.6045, lon: 3.8780 },
+    { nom: "Nîmes", lat: 43.8340, lon: 4.3601 },
+    { nom: "Perpignan", lat: 42.6976, lon: 2.8911 },
+    { nom: "Tarbes", lat: 43.2320, lon: 0.0713 },
+    { nom: "Toulouse-Matabiau", lat: 43.6110, lon: 1.4553 }
+];
+
+gares.forEach(g => {
+    L.marker([g.lat, g.lon])
+        .addTo(map)
+        .bindPopup(`<b>Gare :</b> ${g.nom}`);
+});
+            })
+            .catch(err => console.error("Erreur GeoJSON :", err));
+    </script>
+
+</body>
+</html>
+
+
