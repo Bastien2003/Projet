@@ -5,19 +5,10 @@ import dash
 from dash.exceptions import PreventUpdate
 from dash import dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
+from data_loader import load_all_data
 
-
-# --- Chargement des données -------------------------------------------------
-FILES = {
-    'albi': "C:/Users/SCD-UM/Documents/bases/albi_retard_arrivee_intercites.csv",
-    'bayonne': "C:/Users/SCD-UM/Documents/bases/bayonne_retard_arrivee_intercites.csv",
-    'beziers': "C:/Users/SCD-UM/Documents/bases/beziers_retard_arrivee_intercites.csv",
-    'cerbere': "C:/Users/SCD-UM/Documents/bases/cerbere_retard_arrivee_intercites.csv",
-    'latour': "C:/Users/SCD-UM/Documents/bases/latour_de_carol_retard_arrivee_intercites.csv",
-    'nimes': "C:/Users/SCD-UM/Documents/bases/nimes_retard_arrivee_intercites.csv",
-    'tarbes': "C:/Users/SCD-UM/Documents/bases/tarbes_retard_arrivee_intercites.csv",
-    'toulouse': "C:/Users/SCD-UM/Documents/bases/toulouse_matabiau_retard_arrivee_intercites_REGOUPE.csv",
-}
+# Charger tous les CSV
+data_dict = {k: df for k, df in load_all_data().items() if 'intercites' in k}
 
 REQUIRED_COLS = [
     "Nombre de trains en retard à l'arrivée",
@@ -29,19 +20,26 @@ REQUIRED_COLS = [
 
 frames = []
 try:
-    for k, path in FILES.items():
-        df = pd.read_csv(path, sep=';', encoding='UTF-8')
+    for k, df in data_dict.items():
         # Vérifier les colonnes attendues
         missing = [c for c in REQUIRED_COLS if c not in df.columns]
         if missing:
-            raise KeyError(f"Fichier {path} incomplet, colonnes manquantes: {missing}")
+            raise KeyError(f"Fichier {k} incomplet, colonnes manquantes: {missing}")
         frames.append(df)
     print("Toutes les données sont chargées")
 except Exception as e:
     print(f"Erreur chargement: {e}")
     raise
 
-albi, bayonne, beziers, cerbere, latour, nimes, tarbes, toulouse = frames
+# Extraire les DataFrames individuels
+albi = data_dict['albi_intercites']
+bayonne = data_dict['bayonne_intercites']
+beziers = data_dict['beziers_intercites']
+cerbere = data_dict['cerbere_intercites']
+latour = data_dict['latour_de_carol_intercites']
+nimes = data_dict['nimes_intercites']
+tarbes = data_dict['tarbes_intercites']
+toulouse = data_dict['toulouse_intercites']
 
 albi['Ville'] = 'Albi'
 albi['Départ'] = 'Paris-Austerlitz'
@@ -68,7 +66,7 @@ toulouse['Ville'] = 'Toulouse'
 if 'Départ' not in toulouse.columns:
     toulouse['Départ'] = 'Inconnu'
 
-# --- Combinaison et conversion des dates ----------------------------------
+# Combinaison et conversion des dates
 toutes_donnees = pd.concat([albi, bayonne, beziers, cerbere, latour, nimes, tarbes, toulouse], ignore_index=True)
 
 # On s'attend que la colonne "Date" soit au format YYYY-MM (ex: '2023-01').
@@ -79,17 +77,14 @@ toutes_donnees['Date_complete'] = pd.to_datetime(toutes_donnees['Date'].astype(s
 toutes_donnees['Annee'] = toutes_donnees['Date_complete'].dt.year
 toutes_donnees['Mois'] = toutes_donnees['Date_complete'].dt.month
 
-print(f"Données combinées: {len(toutes_donnees)} lignes")
-print(f"Villes disponibles: {sorted(toutes_donnees['Ville'].dropna().unique())}")
-
-# --- Constantes colonnes --------------------------------------------------
+# Constantes colonnes 
 COLONNE_RETARD = "Nombre de trains en retard à l'arrivée"
 COLONNE_ANNULE = "Nombre de trains annulés"
 COLONNE_PROGRAMME = "Nombre de trains programmés"
 COLONNE_CIRCULE = "Nombre de trains ayant circulé"
 COLONNE_DATE = "Date"
 
-# --- Application Dash -----------------------------------------------------
+# Application Dash 
 app = dash.Dash(
     __name__,
     external_stylesheets=[dbc.themes.BOOTSTRAP],
@@ -278,4 +273,3 @@ def update_graphique(ville, gare, annee):
 if __name__ == '__main__':
     print("Application disponible sur: http://localhost:8050")
     app.run(debug=True, port=8050)
-
