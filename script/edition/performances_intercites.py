@@ -1,114 +1,143 @@
 import pandas as pd
 import plotly.express as px
 
+from data_loader import load_all_data
 
-fichiers = {
-    'albi': "C:/Users/SCD-UM/Documents/bases/albi_retard_arrivee_intercites.csv",
-    'bayonne': "C:/Users/SCD-UM/Documents/bases/bayonne_retard_arrivee_intercites.csv", 
-    'beziers': "C:/Users/SCD-UM/Documents/bases/beziers_retard_arrivee_intercites.csv",
-    'cerbere': "C:/Users/SCD-UM/Documents/bases/cerbere_retard_arrivee_intercites.csv",
-    'latour': "C:/Users/SCD-UM/Documents/bases/latour_de_carol_retard_arrivee_intercites.csv",
-    'nimes': "C:/Users/SCD-UM/Documents/bases/nimes_retard_arrivee_intercites.csv",
-    'tarbes': "C:/Users/SCD-UM/Documents/bases/tarbes_retard_arrivee_intercites.csv",
-    'toulouse': "C:/Users/SCD-UM/Documents/bases/toulouse_matabiau_retard_arrivee_intercites_REGOUPE.csv"
-}
+#Charger les fichiers "intercites" uniquement
+data_dict = {k: df for k, df in load_all_data().items() if "intercites" in k}
 
-# 2. CHARGEMENT AVEC POINTS-VIRGULES
-liste_dataframes = []
+#Vérification qu'on a bien chargé des données
+if not data_dict:
+    raise ValueError("Aucune donnée 'intercites' trouvée")
 
-for ville, chemin in fichiers.items():
-    try:
-        # Charger avec point-virgule comme séparateur
-        df_temp = pd.read_csv(chemin, encoding='utf-8', sep=';')
-        
-        # Pour Toulouse, on garde la colonne Départ originale
-        if ville == 'toulouse':
-            df_temp['Ville_départ'] = df_temp['Départ']
-        else:
-            df_temp['Ville_départ'] = ville.capitalize()
-            
-        liste_dataframes.append(df_temp)
-        print(f"✅ {ville.capitalize()} : {len(df_temp)} lignes")
-        
-    except Exception as e:
-        try:
-            df_temp = pd.read_csv(chemin, encoding='latin-1', sep=';')
-            if ville == 'toulouse':
-                df_temp['Ville_départ'] = df_temp['Départ']
-            else:
-                df_temp['Ville_départ'] = ville.capitalize()
-            liste_dataframes.append(df_temp)
-        except Exception as e2:
-            print( f" impossible de charger {ville} : {e2}")
+# Nettoyage spécifique pour chaque fichier
+for k, df in data_dict.items():
+    # Nettoyage de base des colonnes
+    df.columns = df.columns.str.strip()
+    
+    if k == "tarbes_intercites":
+        # Si Tarbes est en Départ, on inverse avec Arrivée
+        if 'Départ' in df.columns and 'Arrivée' in df.columns:
+            # Vérifier si Tarbes est dans Départ
+            tarbes_in_depart = df['Départ'].astype(str).str.contains('Tarbes', case=False, na=False).any()
+            if tarbes_in_depart:
+                print(f"Correction inversion Départ/Arrivée pour {k}")
+                # Inverser les colonnes
+                df[['Départ', 'Arrivée']] = df[['Arrivée', 'Départ']]
 
-# Combiner toutes les données
-df_complet = pd.concat(liste_dataframes, ignore_index=True)
+    elif k in ["albi_intercites", "cerbere_intercites", "latour_de_carol_intercites"]:
+        if 'Départ' in df.columns and 'Arrivée' in df.columns:
+            # Ces lignes partent de Paris-Austerlitz, donc Paris devrait être en Départ
+            paris_in_arrivee = df['Arrivée'].astype(str).str.contains('Paris', case=False, na=False).any()
+            if paris_in_arrivee:
+                print(f"Correction inversion Départ/Arrivée pour {k}")
+                df[['Départ', 'Arrivée']] = df[['Arrivée', 'Départ']]
 
+# Concaténer tous les DataFrames
+df_complet = pd.concat(data_dict.values(), ignore_index=True)
 
-# 3. NETTOYAGE DES COLONNES
+# Standardisation des noms de colonnes
 df_complet.columns = df_complet.columns.str.strip()
 
-# Renommer les colonnes
+# Mapping des colonnes - version simplifiée
 mapping_colonnes = {
     'Date': 'Date',
-    'Départ': 'Départ', 
+    'Départ': 'Départ',
     'Arrivée': 'Arrivée',
     'Nombre de trains programmés': 'Trains_programmés',
     'Nombre de trains ayant circulé': 'Trains_circulés',
     'Nombre de trains annulés': 'Trains_annulés',
     "Nombre de trains en retard à l'arrivée": 'Trains_retard',
-    'Taux de régularité': 'Taux_régularité',
-    'Ville_départ': 'Ville_départ'
+    'Taux de régularité': 'Taux_régularité'
 }
 
-df_complet = df_complet.rename(columns=mapping_colonnes)
+# Renommer uniquement les colonnes qui existent
+df_complet = df_complet.rename(columns={
+    k: v for k, v in mapping_colonnes.items() 
+    if k in df_complet.columns
+})
 
-df_filtre = df_complet[df_complet['Départ'] != df_complet['Arrivée']].copy()
+# Nettoyage et validation
+# Filtrer les lignes où Départ et Arrivée sont identiques ou manquantes
+mask_valide = (
+    df_complet['Départ'].notna() & 
+    df_complet['Arrivée'].notna() & 
+    (df_complet['Départ'] != df_complet['Arrivée'])
+)
+df_filtre = df_complet[mask_valide].copy()
 
-# 5. PRÉPARATION DES DONNÉES 
-colonnes_numeriques = ['Trains_programmés', 'Trains_circulés', 'Trains_annulés', 'Trains_retard', 'Taux_régularité']
+# Conversion des colonnes numériques
+colonnes_numeriques = ['Trains_programmés', 'Trains_circulés', 
+                       'Trains_annulés', 'Trains_retard', 'Taux_régularité']
 
 for col in colonnes_numeriques:
     if col in df_filtre.columns:
-        df_filtre[col] = df_filtre[col].astype(str).str.replace(',', '.').str.replace(' ', '')
+        df_filtre[col] = (
+            df_filtre[col]
+            .astype(str)
+            .str.replace(',', '.', regex=False)
+            .str.replace(' ', '', regex=False)
+            .str.replace(r'[^\d\.\-]', '', regex=True)
+        )
         df_filtre[col] = pd.to_numeric(df_filtre[col], errors='coerce')
 
+# Afficher les relations uniques pour vérifier
+print("\n=== RELATIONS UNIQUES DÉPART -> ARRIVÉE ===")
+relations_uniques = df_filtre[['Départ', 'Arrivée']].drop_duplicates()
+print(relations_uniques.sort_values(['Départ', 'Arrivée']).to_string())
 
+# Compter les occurrences
+print("\n=== NOMBRE DE RELATIONS PAR GARE DE DÉPART ===")
+depart_counts = df_filtre['Départ'].value_counts()
+print(depart_counts)
+
+print("\n=== NOMBRE DE RELATIONS PAR GARE D'ARRIVÉE ===")
+arrivee_counts = df_filtre['Arrivée'].value_counts()
+print(arrivee_counts)
+
+# Agrégation
 df_summary = df_filtre.groupby(['Départ', 'Arrivée']).agg({
     'Trains_programmés': 'sum',
     'Trains_circulés': 'sum',
-    'Taux_régularité': 'mean',  # On garde la moyenne du taux SNCF
+    'Taux_régularité': 'mean',
     'Trains_retard': 'sum',
     'Trains_annulés': 'sum'
 }).reset_index()
 
-
-# Taux d'annulation
+# Calcul des taux
 df_summary['Taux_annulation'] = (
     df_summary['Trains_annulés'] / df_summary['Trains_programmés'] * 100
 ).round(1)
+df_summary['Taux_annulation'] = df_summary['Taux_annulation'].fillna(0)
 
-# Taux de retard 
 df_summary['Taux_retard'] = (
     df_summary['Trains_retard'] / df_summary['Trains_circulés'] * 100
 ).round(1)
+df_summary['Taux_retard'] = df_summary['Taux_retard'].fillna(0)
 
-# Nettoyer les données
-df_summary = df_summary[df_summary['Taux_régularité'].notna()]
-df_summary = df_summary[df_summary['Taux_régularité'].between(0, 100)]
+# Filtrer les valeurs aberrantes
+df_summary = df_summary[
+    df_summary['Taux_régularité'].notna() & 
+    df_summary['Taux_régularité'].between(0, 100)
+]
 
-# 7. CRÉATION DU PLOT SIMPLIFIÉ
+# VÉRIFICATION FINALE DES DONNÉES
+print("\n=== DONNÉES AGRÉGÉES POUR VISUALISATION ===")
+print(f"Nombre total de relations: {len(df_summary)}")
+print(f"Gares de départ uniques: {df_summary['Départ'].nunique()}")
+print(f"Gares d'arrivée uniques: {df_summary['Arrivée'].nunique()}")
 
+# Scatter plot Plotly
 fig = px.scatter(
     df_summary,
     x='Trains_programmés',
-    y='Taux_régularité', 
+    y='Taux_régularité',
     size='Trains_retard',
-    color='Départ',
+    color='Départ',  # Maintenant Départ est correct
     hover_name='Arrivée',
     custom_data=['Départ', 'Trains_programmés', 'Trains_circulés', 'Taux_régularité', 
                  'Trains_retard', 'Trains_annulés', 'Taux_annulation', 'Taux_retard'],
-    title='Analyse de Performance du Réseau Intercités d\'occitanie<br><sub>Taille = Nombre de retards | Couleur = Gare de départ</sub>',
+    title='Analyse de Performance du Réseau Intercités d\'Occitanie<br><sub>Taille = Nombre de retards | Couleur = Gare de départ</sub>',
     labels={
         'Trains_programmés': 'Trains Programmes (total)',
         'Taux_régularité': 'Taux de Régularité SNCF (%)',
@@ -118,25 +147,20 @@ fig = px.scatter(
     size_max=40
 )
 
-# 8. FORMATAGE DES AXES
+# Formatage axes
 fig.update_layout(
-    xaxis=dict(
-        showgrid=True, 
-        title="Traffic total (trains programmés)",
-        tickformat=',d'
-    ),
-    yaxis=dict(
-        showgrid=True, 
-        title="Fiabilité (taux de régularité SNCF %)",
-        ticksuffix='%'
-    ),
+    xaxis=dict(showgrid=True, title="Traffic total (trains programmés)", tickformat=',d'),
+    yaxis=dict(showgrid=True, title="Fiabilité (taux de régularité SNCF %)", ticksuffix='%'),
     hoverlabel=dict(bgcolor="white", font_size=12, font_family="Arial"),
     plot_bgcolor='rgba(248,248,248,0.8)',
     height=700,
-    showlegend=True
+    showlegend=True,
+    legend=dict(
+        title="Gares de départ",
+        itemsizing='constant'
+    )
 )
-
-
+#infobulle
 fig.update_traces(
     hovertemplate="<br>".join([
         "<b>%{hovertext}</b>",
@@ -150,27 +174,8 @@ fig.update_traces(
         "Taux de retard: %{customdata[7]:.1f}%",
         "<extra></extra>"
     ]),
-    marker=dict(
-        opacity=0.7,
-        line=dict(width=1, color='DarkSlateGrey'),
-        sizemin=4
-    )
+    marker=dict(opacity=0.7, line=dict(width=1, color='DarkSlateGrey'), sizemin=4)
 )
 
-# 9. AFFICHAGE ET SAUVEGARDE
+# Affichage
 fig.show()
-
-fig.write_html("C:/Users/SCD-UM/Documents/bases/performance_intercites_simple.html")
-print("Graphique sauvegardé : performance_intercites_simple.html")
-
-# 10. STATISTIQUES SIMPLES
-print("\n TOP 5 DES RELATIONS LES PLUS FIABLES :")
-top_fiables = df_summary.nlargest(5, 'Taux_régularité')[['Départ', 'Arrivée', 'Taux_régularité', 'Trains_programmés']]
-print(top_fiables.to_string(index=False))
-
-print("\n TOP 5 DES RELATIONS LES MOINS FIABLES :")
-top_problematiques = df_summary.nsmallest(5, 'Taux_régularité')[['Départ', 'Arrivée', 'Taux_régularité', 'Trains_programmés']]
-print(top_problematiques.to_string(index=False))
-
-with open("figure.json", "w", encoding="utf-8") as f:
-    f.write(fig.to_json())
