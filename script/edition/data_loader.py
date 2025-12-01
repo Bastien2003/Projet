@@ -22,6 +22,13 @@ def load_all_data():
     data_dict = {}
     for name, url in urls.items():
         filename = pooch.retrieve(url=url, known_hash=None)
-        data_dict[name] = pd.read_csv(filename)
-    
+        try:
+            data_dict[name] = pd.read_csv(
+                filename, 
+                sep=';', 
+                encoding='utf-8', 
+                on_bad_lines='skip'  # ignore les lignes malformées
+            )
+        except Exception as e:
+            print(f"Erreur lecture du fichier {name}: {e}")
     return data_dict
