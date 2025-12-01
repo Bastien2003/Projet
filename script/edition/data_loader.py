@@ -1,7 +1,8 @@
 import pooch
 import pandas as pd
 
-urls = {
+def load_all_data():
+    urls = {
     "albi_intercites": "https://drive.google.com/uc?export=download&id=1sOx07CWnSI4uF-EbekytHxp7pM-efv1T",
     "bayonne_intercites" : "https://drive.google.com/uc?export=download&id=1NmcPWkFA0oyWByA0qzFfDCmeAwGK26-W",
     "beziers_intercites" : "https://drive.google.com/uc?export=download&id=1UWqKtoOyDCjLX1VJ6ZmAW-wIMXGkL-y7",
@@ -16,10 +17,11 @@ urls = {
     "toulouse_intercites" : "https://drive.google.com/uc?export=download&id=1sL1GmwBQwLXLQGpnRXg5vwJZ4AjC7cMn",
     "toulouse_tgv" : "https://drive.google.com/uc?export=download&id=14mtGuOHL9T5S5DTch7wnKAOAMkPj6k5F",
     "cerbere_intercites" : "https://drive.google.com/uc?export=download&id=17aNXrns0-ncTSs1BZ6EGYUy3TIZJD7Jd",
-}
-
-data_dict = {}
-for name, url in urls.items():
-    filename = pooch.retrieve(url=url, known_hash=None)
-    data_dict[name] = pd.read_csv(filename)
-
+    }
+    
+    data_dict = {}
+    for name, url in urls.items():
+        filename = pooch.retrieve(url=url, known_hash=None)
+        data_dict[name] = pd.read_csv(filename)
+    
+    return data_dict
