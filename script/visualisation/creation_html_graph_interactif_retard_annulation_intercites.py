@@ -1,18 +1,10 @@
 import pandas as pd
 import json
-from datetime import datetime
+from data_loader import load_all_data
 
-# --- Chargement des données -------------------------------------------------
-FILES = {
-    'albi': "C:/Users/SCD-UM/Documents/bases/albi_retard_arrivee_intercites.csv",
-    'bayonne': "C:/Users/SCD-UM/Documents/bases/bayonne_retard_arrivee_intercites.csv",
-    'beziers': "C:/Users/SCD-UM/Documents/bases/beziers_retard_arrivee_intercites.csv",
-    'cerbere': "C:/Users/SCD-UM/Documents/bases/cerbere_retard_arrivee_intercites.csv",
-    'latour': "C:/Users/SCD-UM/Documents/bases/latour_de_carol_retard_arrivee_intercites.csv",
-    'nimes': "C:/Users/SCD-UM/Documents/bases/nimes_retard_arrivee_intercites.csv",
-    'tarbes': "C:/Users/SCD-UM/Documents/bases/tarbes_retard_arrivee_intercites.csv",
-    'toulouse': "C:/Users/SCD-UM/Documents/bases/toulouse_matabiau_retard_arrivee_intercites_REGOUPE.csv",
-}
+
+# --- Charger uniquement les fichiers "intercites"
+data_dict = {k: df for k, df in load_all_data().items() if 'intercites' in k}
 
 REQUIRED_COLS = [
     "Nombre de trains en retard à l'arrivée",
@@ -22,72 +14,56 @@ REQUIRED_COLS = [
     "Date"
 ]
 
+# Vérification et concaténation
 frames = []
-try:
-    for k, path in FILES.items():
-        df = pd.read_csv(path, sep=';', encoding='UTF-8')
-        # Vérifier les colonnes attendues
-        missing = [c for c in REQUIRED_COLS if c not in df.columns]
-        if missing:
-            raise KeyError(f"Fichier {path} incomplet, colonnes manquantes: {missing}")
-        frames.append(df)
-    print("Toutes les données sont chargées")
-except Exception as e:
-    print(f"Erreur chargement: {e}")
-    exit()
+for k, df in data_dict.items():
+    missing = [c for c in REQUIRED_COLS if c not in df.columns]
+    if missing:
+        raise KeyError(f"Fichier {k} incomplet, colonnes manquantes: {missing}")
+    frames.append(df)
 
-# --- Normalisation des métadonnées -----
-albi, bayonne, beziers, cerbere, latour, nimes, tarbes, toulouse = frames
+# Extraire les DataFrames individuellement
+albi = data_dict['albi_intercites']
+bayonne = data_dict['bayonne_intercites']
+beziers = data_dict['beziers_intercites']
+cerbere = data_dict['cerbere_intercites']
+latour = data_dict['latour_de_carol_intercites']
+nimes = data_dict['nimes_intercites']
+tarbes = data_dict['tarbes_intercites']
+toulouse = data_dict['toulouse_intercites']
 
-albi['Ville'] = 'Albi'
-albi['Départ'] = 'Paris-Austerlitz'
-
-bayonne['Ville'] = 'Bayonne'
-bayonne['Départ'] = 'Toulouse-Matabiau'
-
-beziers['Ville'] = 'Beziers'
-beziers['Départ'] = 'Clermont-Ferrand'
-
-cerbere['Ville'] = 'Cerbere'
-cerbere['Départ'] = 'Paris-Austerlitz'
-
-latour['Ville'] = 'Latour de Carol'
-latour['Départ'] = 'Paris-Austerlitz'
-
-nimes['Ville'] = 'Nîmes'
-nimes['Départ'] = 'Clermont-Ferrand'
-
-tarbes['Ville'] = 'Tarbes'
-tarbes['Départ'] = 'Paris-Austerlitz'
-
+# Ajout données
+albi['Ville'], albi['Départ'] = 'Albi', 'Paris-Austerlitz'
+bayonne['Ville'], bayonne['Départ'] = 'Bayonne', 'Toulouse-Matabiau'
+beziers['Ville'], beziers['Départ'] = 'Beziers', 'Clermont-Ferrand'
+cerbere['Ville'], cerbere['Départ'] = 'Cerbere', 'Paris-Austerlitz'
+latour['Ville'], latour['Départ'] = 'Latour de Carol', 'Paris-Austerlitz'
+nimes['Ville'], nimes['Départ'] = 'Nîmes', 'Clermont-Ferrand'
+tarbes['Ville'], tarbes['Départ'] = 'Tarbes', 'Paris-Austerlitz'
 toulouse['Ville'] = 'Toulouse'
 if 'Départ' not in toulouse.columns:
     toulouse['Départ'] = 'Inconnu'
 
-# --- Combinaison et conversion des dates ----------------------------------
+# Combinaison et dates
 toutes_donnees = pd.concat([albi, bayonne, beziers, cerbere, latour, nimes, tarbes, toulouse], ignore_index=True)
-
-toutes_donnees['Date_complete'] = pd.to_datetime(toutes_donnees['Date'].astype(str) + '-01', format='%Y-%m-%d', errors='coerce')
+toutes_donnees['Date_complete'] = pd.to_datetime(toutes_donnees['Date'].astype(str) + '-01', errors='coerce')
 toutes_donnees['Annee'] = toutes_donnees['Date_complete'].dt.year
 toutes_donnees['Mois'] = toutes_donnees['Date_complete'].dt.month
+toutes_donnees['Date_iso'] = toutes_donnees['Date_complete'].dt.strftime('%Y-%m-%d')
 
-# --- Constantes colonnes --------------------------------------------------
 COLONNE_RETARD = "Nombre de trains en retard à l'arrivée"
 COLONNE_ANNULE = "Nombre de trains annulés"
 COLONNE_PROGRAMME = "Nombre de trains programmés"
 COLONNE_CIRCULE = "Nombre de trains ayant circulé"
 
-# --- Préparer les données pour JavaScript --------------------------------
-# Convertir les dates en format ISO pour JavaScript
-toutes_donnees['Date_iso'] = toutes_donnees['Date_complete'].dt.strftime('%Y-%m-%d')
+# Colonnes à exporter pour JS
+cols_export = ['Ville', 'Départ', 'Date', 'Date_iso', 'Annee', 'Mois',
+               COLONNE_RETARD, COLONNE_ANNULE, COLONNE_PROGRAMME, COLONNE_CIRCULE]
 
-# Sélectionner les colonnes nécessaires
-donnees_js = toutes_donnees[[
-    'Ville', 'Départ', 'Date', 'Date_iso', 'Annee', 'Mois',
-    COLONNE_RETARD, COLONNE_ANNULE, COLONNE_PROGRAMME, COLONNE_CIRCULE
-]].to_dict('records')
 
-# --- Créer le fichier HTML ------------------------------------------------
+donnees_js = toutes_donnees[cols_export].to_dict('records')
+
+# Création du fichier HTML
 html_content = f'''
 <!DOCTYPE html>
 <html lang="fr">
@@ -373,7 +349,7 @@ html_content = f'''
                 y: donneesTriées.map(d => d.retard),
                 name: 'Trains en retard',
                 type: 'bar',
-                marker: {{ color: '#FFE3AA' }}
+                marker: {{ color: '#FFC966' }}
             }};
 
             const traceAnnules = {{
@@ -442,10 +418,4 @@ html_content = f'''
 </body>
 </html>
 '''
-
-# Sauvegarder le fichier HTML
-with open("graph_interactif_retard_annulation_tgv.html", "w", encoding="utf-8") as f:
-    f.write(html_content)
-
-print("Fichier HTML créé: graph_interactif_retard_annulation_tgv.html")
 
