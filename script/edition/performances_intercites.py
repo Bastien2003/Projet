@@ -12,10 +12,15 @@ Ce script :
 
 import pandas as pd
 import plotly.express as px
-from data_loader import load_all_data
+from data_loader import DataLoader
+
+
+# Chargement des données via la nouvelle classe
+loader = DataLoader()
+all_data = loader.load_all_data()
 
 #Charger les fichiers "intercites" uniquement
-data_dict = {k: df for k, df in load_all_data().items() if "intercites" in k}
+data_dict = {k: df for k, df in all_data.items() if "intercites" in k}
 
 #Vérification qu'on a bien chargé des données
 if not data_dict:
