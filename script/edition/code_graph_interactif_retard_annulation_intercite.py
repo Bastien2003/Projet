@@ -14,10 +14,13 @@ import dash
 from dash.exceptions import PreventUpdate
 from dash import dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
-from data_loader import load_all_data
+from data_loader import DataLoader
 
+
+loader=DataLoader()
+data_dict = loader.load_all_data()
 # Charger tous les CSV
-data_dict = {k: df for k, df in load_all_data().items() if 'intercites' in k}
+data_dict = {k: df for k, df in data_dict.items() if 'intercites' in k}
 
 REQUIRED_COLS = [
     "Nombre de trains en retard à l'arrivée",
@@ -364,3 +367,4 @@ if __name__ == '__main__':
     """Point d'entrée de l'application : lance le serveur Dash en mode debug."""
     print("Application disponible sur: http://localhost:8050")
     app.run(debug=True, port=8050)
+
