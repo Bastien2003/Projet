@@ -1,9 +1,13 @@
 import pandas as pd
 import json
-from data_loader import load_all_data
+from data_loader import DataLoader
+
+# Charger les données via ta classe
+loader = DataLoader()
+data_dict = loader.load_all_data()
 
 #Charger les fichiers "intercites" uniquement
-data_dict = {k: df for k, df in load_all_data().items() if "intercites" in k}
+data_dict = {k: df for k, df in data_dict.items() if "intercites" in k}
 
 # Correction Départ/Arrivée
 for k, df in data_dict.items():

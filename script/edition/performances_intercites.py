@@ -1,16 +1,39 @@
+"""
+Module d'analyse des performances du réseau Intercités en Occitanie.
+
+Ce script :
+- charge les données ferroviaires depuis plusieurs fichiers CSV via `load_all_data()`,
+- filtre et nettoie les données spécifiques aux lignes Intercités,
+- corrige les colonnes 'Départ' et 'Arrivée' selon certaines règles métier,
+- agrège les données par relation Départ -> Arrivée,
+- calcule des indicateurs tels que le taux de retard et d'annulation,
+- génère un scatter plot interactif avec Plotly pour visualiser la performance des lignes.
+"""
+
 import pandas as pd
 import plotly.express as px
+from data_loader import DataLoader
 
-from data_loader import load_all_data
+
+# Chargement des données via la nouvelle classe
+loader = DataLoader()
+all_data = loader.load_all_data()
 
 #Charger les fichiers "intercites" uniquement
-data_dict = {k: df for k, df in load_all_data().items() if "intercites" in k}
+data_dict = {k: df for k, df in all_data.items() if "intercites" in k}
 
 #Vérification qu'on a bien chargé des données
 if not data_dict:
     raise ValueError("Aucune donnée 'intercites' trouvée")
-
+#-------------------------------------
 # Nettoyage spécifique pour chaque fichier
+#-------------------------------------
+"""
+Ce bloc :
+- standardise les noms de colonnes,
+- corrige l'ordre des colonnes 'Départ'/'Arrivée' pour certaines gares,
+- applique des règles spécifiques pour Tarbes, Paris, etc.
+"""
 for k, df in data_dict.items():
     # Nettoyage de base des colonnes
     df.columns = df.columns.str.strip()
@@ -95,6 +118,15 @@ print("\n=== NOMBRE DE RELATIONS PAR GARE D'ARRIVÉE ===")
 arrivee_counts = df_filtre['Arrivée'].value_counts()
 print(arrivee_counts)
 
+# ----------------------------
+# Agrégation et calcul des taux
+# ----------------------------
+"""
+Ce bloc :
+- agrège les données par relation Départ -> Arrivée,
+- calcule le taux d'annulation et le taux de retard,
+- filtre les valeurs aberrantes et prépare les données pour la visualisation.
+"""
 # Agrégation
 df_summary = df_filtre.groupby(['Départ', 'Arrivée']).agg({
     'Trains_programmés': 'sum',
@@ -127,7 +159,17 @@ print(f"Nombre total de relations: {len(df_summary)}")
 print(f"Gares de départ uniques: {df_summary['Départ'].nunique()}")
 print(f"Gares d'arrivée uniques: {df_summary['Arrivée'].nunique()}")
 
-# Scatter plot Plotly
+
+# ----------------------------
+# Visualisation avec Plotly
+# ----------------------------
+"""
+Ce bloc :
+- crée un scatter plot interactif avec Plotly Express,
+- taille des points = nombre de trains en retard,
+- couleur = gare de départ,
+- axes formatés et infobulles personnalisées pour toutes les métriques.
+"""
 fig = px.scatter(
     df_summary,
     x='Trains_programmés',

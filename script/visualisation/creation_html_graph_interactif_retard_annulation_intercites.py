@@ -1,10 +1,11 @@
 import pandas as pd
 import json
-from data_loader import load_all_data
-
+from data_loader import DataLoader
 
 # --- Charger uniquement les fichiers "intercites"
-data_dict = {k: df for k, df in load_all_data().items() if 'intercites' in k}
+loader = DataLoader()
+data_dict = loader.load_all_data()
+data_dict = {k: df for k, df in data_dict.items() if 'intercites' in k}
 
 REQUIRED_COLS = [
     "Nombre de trains en retard à l'arrivée",
@@ -418,4 +419,10 @@ html_content = f'''
 </body>
 </html>
 '''
+
+# Sauvegarde
+with open("graph_interactif_retard_intercites.html","w",encoding="utf-8") as f:
+    f.write(html_content)
+
+print("Fichier HTML créé: graph_interactif_retard_intercites.html")
 
