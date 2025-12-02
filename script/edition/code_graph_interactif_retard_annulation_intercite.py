@@ -1,3 +1,12 @@
+"""
+Application Dash permettant d’analyser les retards des trains Intercités en Occitanie.
+
+Ce module :
+- charge les données ferroviaires issues de plusieurs fichiers CSV,
+- nettoie et fusionne les tableaux,
+- construit une interface Dash composée de dropdowns et d’un graphique dynamique,
+- met à jour les visualisations en fonction des choix de l’utilisateur.
+"""
 import pandas as pd
 import plotly.graph_objects as go
 from datetime import datetime
@@ -94,6 +103,22 @@ server = app.server
 
 # nous servira a obtenir les années disponibles pour une ville et une gare
 def get_available_years(df, ville, gare=None):
+    """
+    retourne la liste des années disponibles pour une ville et eventuellement une gare
+    Paramètres
+    ----------
+    df : pandas.DataFrame
+        Le DataFrame contenant l'ensemble des données ferroviaires.
+    ville : str
+        La ville sélectionnée dans l’interface utilisateur.
+    gare : str, optionnel
+        La gare de départ sélectionnée. Si None, toutes les gares de la ville sont considérées.
+
+    Retour
+    ------
+    list[int]
+        Liste triée (ordre décroissant) des années disponibles pour la combinaison ville/gare.
+    """
     data = df[df['Ville'] == ville]
     if gare:
         data = data[data['Départ'] == gare]
@@ -161,7 +186,30 @@ app.layout = dbc.Container([
     Output('gare-container', 'style'),
     Input('ville-dropdown', 'value')
 )
+
 def update_gare(ville):
+    """
+    Met à jour le contenu du dropdown des gares en fonction de la ville sélectionnée.
+
+    Cette fonction :
+    - récupère les gares disponibles pour la ville,
+    - décide si le dropdown doit être affiché, caché ou désactivé,
+    - préremplit la valeur si une seule gare existe.
+
+    Paramètres
+    ----------
+    ville : str
+        La ville sélectionnée.
+
+    Retour
+    ------
+    tuple :
+        - options (list[dict]) : liste des options du dropdown des gares,
+        - value (str|None) : valeur sélectionnée automatiquement,
+        - disabled (bool) : si le dropdown est désactivé,
+        - style_dropdown (dict) : style CSS du dropdown,
+        - style_container (dict) : style CSS du conteneur.
+    """
     if not ville:
         # garder caché et vide
         return [], None, True, {'display': 'none'}, {'display': 'none'}
@@ -193,6 +241,25 @@ def update_gare(ville):
     Input('gare-dropdown', 'value')
 )
 def update_annee(ville, gare):
+    """
+    Met à jour le dropdown des années disponibles en fonction de la ville et de la gare.
+
+    Cette fonction détermine quelles années sont disponibles pour la combinaison
+    ville + gare, et génère dynamiquement le composant Dash correspondant.
+
+    Paramètres
+    ----------
+    ville : str
+        La ville sélectionnée.
+    gare : str|None
+        La gare sélectionnée ou None si non applicable.
+
+    Retour
+    ------
+    list|dash.html.Div
+        Composants Dash affichant soit le dropdown d'années, soit un message
+        d’indisponibilité si aucune donnée n'est trouvée.
+    """
     if not ville:
         return html.Div()
 
@@ -220,6 +287,29 @@ def update_annee(ville, gare):
     Input('annee-dropdown', 'value')
 )
 def update_graphique(ville, gare, annee):
+    """
+    Génère et met à jour la figure Plotly affichant les performances ferroviaires.
+
+    La fonction :
+    - vérifie et complète les selections manquantes (gare ou année),
+    - filtre les données selon la ville/gare/année,
+    - construit une figure Plotly combinant barres empilées et courbes,
+    - gère les cas où aucune donnée n'est disponible.
+
+    Paramètres
+    ----------
+    ville : str
+        La ville sélectionnée par l'utilisateur.
+    gare : str|None
+        La gare sélectionnée. Peut être None si la ville n'a qu'une seule gare.
+    annee : int|None
+        L'année sélectionnée. Si None, prend la première année disponible.
+
+    Retour
+    ------
+    plotly.graph_objects.Figure
+        La figure représentant les trains programmés, circulés, annulés et en retard.
+    """
     if not ville:
         return go.Figure().update_layout(title="Sélectionnez une ville")
 
@@ -271,5 +361,6 @@ def update_graphique(ville, gare, annee):
 
 
 if __name__ == '__main__':
+    """Point d'entrée de l'application : lance le serveur Dash en mode debug."""
     print("Application disponible sur: http://localhost:8050")
     app.run(debug=True, port=8050)
