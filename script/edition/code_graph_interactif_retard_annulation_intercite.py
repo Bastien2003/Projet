@@ -8,18 +8,12 @@ Ce module :
 - met à jour les visualisations en fonction des choix de l’utilisateur.
 """
 import pandas as pd
-import plotly.graph_objects as go
-from datetime import datetime
-import dash
-from dash.exceptions import PreventUpdate
-from dash import dcc, html, Input, Output, State
-import dash_bootstrap_components as dbc
+import json
 from data_loader import DataLoader
 
-
-loader=DataLoader()
+# --- Charger uniquement les fichiers "intercites"
+loader = DataLoader()
 data_dict = loader.load_all_data()
-# Charger tous les CSV
 data_dict = {k: df for k, df in data_dict.items() if 'intercites' in k}
 
 REQUIRED_COLS = [
@@ -30,20 +24,15 @@ REQUIRED_COLS = [
     "Date"
 ]
 
+# Vérification et concaténation
 frames = []
-try:
-    for k, df in data_dict.items():
-        # Vérifier les colonnes attendues
-        missing = [c for c in REQUIRED_COLS if c not in df.columns]
-        if missing:
-            raise KeyError(f"Fichier {k} incomplet, colonnes manquantes: {missing}")
-        frames.append(df)
-    print("Toutes les données sont chargées")
-except Exception as e:
-    print(f"Erreur chargement: {e}")
-    raise
+for k, df in data_dict.items():
+    missing = [c for c in REQUIRED_COLS if c not in df.columns]
+    if missing:
+        raise KeyError(f"Fichier {k} incomplet, colonnes manquantes: {missing}")
+    frames.append(df)
 
-# Extraire les DataFrames individuels
+# Extraire les DataFrames individuellement
 albi = data_dict['albi_intercites']
 bayonne = data_dict['bayonne_intercites']
 beziers = data_dict['beziers_intercites']
@@ -53,318 +42,393 @@ nimes = data_dict['nimes_intercites']
 tarbes = data_dict['tarbes_intercites']
 toulouse = data_dict['toulouse_intercites']
 
-albi['Ville'] = 'Albi'
-albi['Départ'] = 'Paris-Austerlitz'
-
-bayonne['Ville'] = 'Bayonne'
-bayonne['Départ'] = 'Toulouse-Matabiau'
-
-beziers['Ville'] = 'Beziers'
-beziers['Départ'] = 'Clermont-Ferrand'
-
-cerbere['Ville'] = 'Cerbere'
-cerbere['Départ'] = 'Paris-Austerlitz'
-
-latour['Ville'] = 'Latour de Carol'
-latour['Départ'] = 'Paris-Austerlitz'
-
-nimes['Ville'] = 'Nîmes'
-nimes['Départ'] = 'Clermont-Ferrand'
-
-tarbes['Ville'] = 'Tarbes'
-tarbes['Départ'] = 'Paris-Austerlitz'
-
+# Ajout données
+albi['Ville'], albi['Départ'] = 'Albi', 'Paris-Austerlitz'
+bayonne['Ville'], bayonne['Départ'] = 'Bayonne', 'Toulouse-Matabiau'
+beziers['Ville'], beziers['Départ'] = 'Beziers', 'Clermont-Ferrand'
+cerbere['Ville'], cerbere['Départ'] = 'Cerbere', 'Paris-Austerlitz'
+latour['Ville'], latour['Départ'] = 'Latour de Carol', 'Paris-Austerlitz'
+nimes['Ville'], nimes['Départ'] = 'Nîmes', 'Clermont-Ferrand'
+tarbes['Ville'], tarbes['Départ'] = 'Tarbes', 'Paris-Austerlitz'
 toulouse['Ville'] = 'Toulouse'
 if 'Départ' not in toulouse.columns:
     toulouse['Départ'] = 'Inconnu'
 
-# Combinaison et conversion des dates
+# Combinaison et dates
 toutes_donnees = pd.concat([albi, bayonne, beziers, cerbere, latour, nimes, tarbes, toulouse], ignore_index=True)
-
-# On s'attend que la colonne "Date" soit au format YYYY-MM (ex: '2023-01').
-# Si ce n'est pas le cas, la conversion affichera NaT pour les lignes non conformes.
-toutes_donnees['Date_complete'] = pd.to_datetime(toutes_donnees['Date'].astype(str) + '-01', format='%Y-%m-%d', errors='coerce')
-
-# Extraire l'année et le mois pour faciliter le filtrage
+toutes_donnees['Date_complete'] = pd.to_datetime(toutes_donnees['Date'].astype(str) + '-01', errors='coerce')
 toutes_donnees['Annee'] = toutes_donnees['Date_complete'].dt.year
 toutes_donnees['Mois'] = toutes_donnees['Date_complete'].dt.month
+toutes_donnees['Date_iso'] = toutes_donnees['Date_complete'].dt.strftime('%Y-%m-%d')
 
-# Constantes colonnes 
 COLONNE_RETARD = "Nombre de trains en retard à l'arrivée"
 COLONNE_ANNULE = "Nombre de trains annulés"
 COLONNE_PROGRAMME = "Nombre de trains programmés"
 COLONNE_CIRCULE = "Nombre de trains ayant circulé"
-COLONNE_DATE = "Date"
 
-# Application Dash 
-app = dash.Dash(
-    __name__,
-    external_stylesheets=[dbc.themes.BOOTSTRAP],
-    suppress_callback_exceptions=True
-)
-server = app.server
-
-# nous servira a obtenir les années disponibles pour une ville et une gare
-def get_available_years(df, ville, gare=None):
-    """
-    retourne la liste des années disponibles pour une ville et eventuellement une gare
-    Paramètres
-    ----------
-    df : pandas.DataFrame
-        Le DataFrame contenant l'ensemble des données ferroviaires.
-    ville : str
-        La ville sélectionnée dans l’interface utilisateur.
-    gare : str, optionnel
-        La gare de départ sélectionnée. Si None, toutes les gares de la ville sont considérées.
-
-    Retour
-    ------
-    list[int]
-        Liste triée (ordre décroissant) des années disponibles pour la combinaison ville/gare.
-    """
-    data = df[df['Ville'] == ville]
-    if gare:
-        data = data[data['Départ'] == gare]
-    years = sorted(data['Annee'].dropna().unique(), reverse=True)
-    return years
-
-# Layout
-app.layout = dbc.Container([
-    html.H1("Analyse des retards ferroviaires - Occitanie", className="text-center my-4"),
-
-    dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.Label("Choisir la ville:"),
-                    dcc.Dropdown(
-                        id='ville-dropdown',
-                        options=[{'label': v, 'value': v} for v in sorted(toutes_donnees['Ville'].dropna().unique())],
-                        value=sorted(toutes_donnees['Ville'].dropna().unique())[0]
-                    ),
-                    html.Br(),
-
-                    # Container gare : le dropdown (la barre des options) existe toujours (elle est initialement cachée)
-                    html.Div(
-                        id='gare-container',
-                        children=[
-                            html.Label("Choisir la gare de départ:"),
-                            dcc.Dropdown(
-                                id='gare-dropdown',
-                                options=[],
-                                value=None,
-                                disabled=True,
-                                clearable=False,
-                                style={'display': 'none'}  # caché au départ
-                            )
-                        ]
-                    ),
-                    html.Br(),
-                    html.Div(id='annee-container', children=[
-                        html.Label("Choisir l'année:"),
-                        dcc.Dropdown(id='annee-dropdown', options=[], value=None, disabled=True)
-                    ]),
-                    html.Br(),
-                    html.P("Graphique montrant les trains programmés, ayant circulé, en retard et annulés.")
-                ])
-            ])
-        ], width=3),
-
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    dcc.Graph(id='graphique')
-                ])
-            ])
-        ], width=9)
-    ])
-], fluid=True)
-
-# Callback (fonction qui sera un argument dans une autre fonction plus tard) pour mettre à jour le contenu du container gare (dropdown toujours rendu)
-@app.callback(
-    Output('gare-dropdown', 'options'),
-    Output('gare-dropdown', 'value'),
-    Output('gare-dropdown', 'disabled'),
-    Output('gare-dropdown', 'style'),
-    Output('gare-container', 'style'),
-    Input('ville-dropdown', 'value')
-)
-
-def update_gare(ville):
-    """
-    Met à jour le contenu du dropdown des gares en fonction de la ville sélectionnée.
-
-    Cette fonction :
-    - récupère les gares disponibles pour la ville,
-    - décide si le dropdown doit être affiché, caché ou désactivé,
-    - préremplit la valeur si une seule gare existe.
-
-    Paramètres
-    ----------
-    ville : str
-        La ville sélectionnée.
-
-    Retour
-    ------
-    tuple :
-        - options (list[dict]) : liste des options du dropdown des gares,
-        - value (str|None) : valeur sélectionnée automatiquement,
-        - disabled (bool) : si le dropdown est désactivé,
-        - style_dropdown (dict) : style CSS du dropdown,
-        - style_container (dict) : style CSS du conteneur.
-    """
-    if not ville:
-        # garder caché et vide
-        return [], None, True, {'display': 'none'}, {'display': 'none'}
-
-    # Récupérer les gares pour la ville
-    gares = sorted(
-        toutes_donnees[toutes_donnees['Ville'] == ville]['Départ']
-        .dropna()
-        .unique()
-    )
-
-    # Si 0 ou 1 gare -> on cache le dropdown (la barre des options) (mais il existe toujours dans le layout)
-    if len(gares) <= 1:
-        # si 1 gare, on peut préremplir la valeur (utile pour le filtrage ensuite)
-        value = gares[0] if len(gares) == 1 else None
-        return [], value, True, {'display': 'none'}, {'display': 'none'}
-
-    # Si plusieurs gares -> on affiche et on remplit les options
-    options = [{'label': g, 'value': g} for g in gares]
-    value = gares[0]  # valeur par défaut (première)
-    return options, value, False, {'display': 'block'}, {'display': 'block'}
+# Colonnes à exporter pour JS
+cols_export = ['Ville', 'Départ', 'Date', 'Date_iso', 'Annee', 'Mois',
+               COLONNE_RETARD, COLONNE_ANNULE, COLONNE_PROGRAMME, COLONNE_CIRCULE]
 
 
+donnees_js = toutes_donnees[cols_export].to_dict('records')
 
-# Callback (fonction qui sera un argument dans une autre fonction plus tard) pour mettre à jour les années disponibles (dépend de ville ET gare)
-@app.callback(
-    Output('annee-container', 'children'),
-    Input('ville-dropdown', 'value'),
-    Input('gare-dropdown', 'value')
-)
-def update_annee(ville, gare):
-    """
-    Met à jour le dropdown des années disponibles en fonction de la ville et de la gare.
+# Création du fichier HTML
+html_content = f'''
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse des retards ferroviaires - Occitanie</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {{
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }}
+        .container {{
+            max-width: 1400px;
+            margin-top: 20px;
+        }}
+        .card {{
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: none;
+            border-radius: 10px;
+        }}
+        .card-body {{
+            padding: 25px;
+        }}
+        h1 {{
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+        }}
+        .control-group {{
+            margin-bottom: 20px;
+        }}
+        label {{
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }}
+        .form-select {{
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }}
+        .form-select:focus {{
+            border-color: #2E86AB;
+            box-shadow: 0 0 0 0.2rem rgba(46, 134, 171, 0.25);
+        }}
+        #graphique {{
+            width: 100%;
+            height: 600px;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+        }}
+        .loading {{
+            text-align: center;
+            padding: 50px;
+            color: #6c757d;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Analyse des retards ferroviaires - Occitanie</h1>
+        
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="control-group">
+                            <label for="ville-select" class="form-label">Choisir la ville:</label>
+                            <select id="ville-select" class="form-select">
+                                <option value="">Sélectionnez une ville</option>
+                            </select>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label for="gare-select" class="form-label">Choisir la gare de départ:</label>
+                            <select id="gare-select" class="form-select" disabled>
+                                <option value="">-- Sélectionnez d'abord une ville --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label for="annee-select" class="form-label">Choisir l'année:</label>
+                            <select id="annee-select" class="form-select" disabled>
+                                <option value="">-- Sélectionnez d'abord une ville --</option>
+                            </select>
+                        </div>
+                        
+                        <p class="text-muted mt-4">
+                            Graphique montrant les trains programmés, ayant circulé, en retard et annulés.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-9">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="graphique" class="loading">
+                            Chargement du graphique...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    Cette fonction détermine quelles années sont disponibles pour la combinaison
-    ville + gare, et génère dynamiquement le composant Dash correspondant.
+    <script>
+        // Données intégrées dans la page
+        const toutesDonnees = {json.dumps(donnees_js, ensure_ascii=False)};
+        
+        // Variables globales
+        let currentVille = '';
+        let currentGare = '';
+        let currentAnnee = '';
 
-    Paramètres
-    ----------
-    ville : str
-        La ville sélectionnée.
-    gare : str|None
-        La gare sélectionnée ou None si non applicable.
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {{
+            initialiserApplication();
+        }});
 
-    Retour
-    ------
-    list|dash.html.Div
-        Composants Dash affichant soit le dropdown d'années, soit un message
-        d’indisponibilité si aucune donnée n'est trouvée.
-    """
-    if not ville:
-        return html.Div()
+        function initialiserApplication() {{
+            initialiserSelectVilles();
+            ajouterEcouteurs();
+            mettreAJourGraphique();
+        }}
 
-    annees = get_available_years(toutes_donnees, ville, gare)
-    if not annees:
-        return html.P("Aucune donnée disponible pour la combinaison sélectionnée")
+        function initialiserSelectVilles() {{
+            const villes = [...new Set(toutesDonnees.map(d => d.Ville))].sort();
+            const select = document.getElementById('ville-select');
+            
+            villes.forEach(ville => {{
+                const option = document.createElement('option');
+                option.value = ville;
+                option.textContent = ville;
+                select.appendChild(option);
+            }});
 
-    # Si une seule année, la liste de choix est désactivée
-    disabled = len(annees) == 1
-    return [
-        html.Label("Choisir l'année:"),
-        dcc.Dropdown(
-            id='annee-dropdown',
-            options=[{'label': str(a), 'value': a} for a in annees],
-            value=annees[0],
-            disabled=disabled
-        )
-    ]
+            // Sélectionner Albi par défaut
+            if (villes.includes('Albi')) {{
+                select.value = 'Albi';
+                select.dispatchEvent(new Event('change'));
+            }}
+        }}
 
-# Callback (fonction qui sera un argument dans une autre fonction plus tard) unique pour mettre à jour le graphique (dépend de ville, gare, année)
-@app.callback(
-    Output('graphique', 'figure'),
-    Input('ville-dropdown', 'value'),
-    Input('gare-dropdown', 'value'),
-    Input('annee-dropdown', 'value')
-)
-def update_graphique(ville, gare, annee):
-    """
-    Génère et met à jour la figure Plotly affichant les performances ferroviaires.
+        function ajouterEcouteurs() {{
+            document.getElementById('ville-select').addEventListener('change', function(e) {{
+                currentVille = e.target.value;
+                mettreAJourGares();
+                mettreAJourAnnees();
+                mettreAJourGraphique();
+            }});
 
-    La fonction :
-    - vérifie et complète les selections manquantes (gare ou année),
-    - filtre les données selon la ville/gare/année,
-    - construit une figure Plotly combinant barres empilées et courbes,
-    - gère les cas où aucune donnée n'est disponible.
+            document.getElementById('gare-select').addEventListener('change', function(e) {{
+                currentGare = e.target.value;
+                mettreAJourAnnees();
+                mettreAJourGraphique();
+            }});
 
-    Paramètres
-    ----------
-    ville : str
-        La ville sélectionnée par l'utilisateur.
-    gare : str|None
-        La gare sélectionnée. Peut être None si la ville n'a qu'une seule gare.
-    annee : int|None
-        L'année sélectionnée. Si None, prend la première année disponible.
+            document.getElementById('annee-select').addEventListener('change', function(e) {{
+                currentAnnee = e.target.value;
+                mettreAJourGraphique();
+            }});
+        }}
 
-    Retour
-    ------
-    plotly.graph_objects.Figure
-        La figure représentant les trains programmés, circulés, annulés et en retard.
-    """
-    if not ville:
-        return go.Figure().update_layout(title="Sélectionnez une ville")
+        function mettreAJourGares() {{
+            const selectGare = document.getElementById('gare-select');
+            
+            if (!currentVille) {{
+                selectGare.innerHTML = '<option value="">-- Sélectionnez d\\'abord une ville --</option>';
+                selectGare.disabled = true;
+                return;
+            }}
 
-    # Si l'année ou la gare n'est pas fournie, on tente de prendre la première disponible
-    if gare is None:
-        gares = sorted(toutes_donnees[toutes_donnees['Ville'] == ville]['Départ'].dropna().unique())
-        gare = gares[0] if gares else None
+            const gares = [...new Set(toutesDonnees
+                .filter(d => d.Ville === currentVille)
+                .map(d => d.Départ))].sort();
 
-    if annee is None:
-        annees = get_available_years(toutes_donnees, ville, gare)
-        annee = annees[0] if annees else None
+            selectGare.innerHTML = '';
+            
+            if (gares.length > 1) {{
+                gares.forEach(gare => {{
+                    const option = document.createElement('option');
+                    option.value = gare;
+                    option.textContent = gare;
+                    selectGare.appendChild(option);
+                }});
+                selectGare.disabled = false;
+                currentGare = gares[0];
+                selectGare.value = currentGare;
+            }} else {{
+                selectGare.innerHTML = '<option value="">Une seule gare disponible</option>';
+                selectGare.disabled = true;
+                currentGare = gares.length === 1 ? gares[0] : '';
+            }}
+        }}
 
-    if annee is None:
-        return go.Figure().update_layout(title=f"Aucune donnée pour {ville}")
+        function mettreAJourAnnees() {{
+            const selectAnnee = document.getElementById('annee-select');
+            
+            if (!currentVille) {{
+                selectAnnee.innerHTML = '<option value="">-- Sélectionnez d\\'abord une ville --</option>';
+                selectAnnee.disabled = true;
+                return;
+            }}
 
-    # Filtrer
-    data = toutes_donnees[(toutes_donnees['Ville'] == ville) & (toutes_donnees['Annee'] == int(annee))]
-    if gare:
-        data = data[data['Départ'] == gare]
+            let donneesFiltrees = toutesDonnees.filter(d => d.Ville === currentVille);
+            if (currentGare) {{
+                donneesFiltrees = donneesFiltrees.filter(d => d.Départ === currentGare);
+            }}
 
-    if data.empty:
-        titre = f"Aucune donnée pour {gare or 'N/A'} → {ville} en {annee}"
-        return go.Figure().update_layout(title=titre)
+            const annees = [...new Set(donneesFiltrees.map(d => d.Annee))].sort((a, b) => b - a);
 
-    # Tri par date
-    data = data.sort_values('Date_complete')
-    # Construire la figure
-    fig = go.Figure()
-    pastel_retard = '#FFE3AA'
-    pastel_annule = '#FFD1DC'
-    pastel_programme = '#B5EAD7'
-    pastel_circule = '#2E86AB'
-    fig.add_trace(go.Bar(x=data['Date_complete'], y=data[COLONNE_RETARD], name='Trains en retard'))
-    fig.add_trace(go.Bar(x=data['Date_complete'], y=data[COLONNE_ANNULE], name='Trains annulés'))
-    fig.add_trace(go.Scatter(x=data['Date_complete'], y=data[COLONNE_PROGRAMME], name='Trains programmés', mode='lines'))
-    fig.add_trace(go.Scatter(x=data['Date_complete'], y=data[COLONNE_CIRCULE], name='Trains ayant circulé', mode='lines'))
+            selectAnnee.innerHTML = '';
+            
+            if (annees.length > 0) {{
+                annees.forEach(annee => {{
+                    const option = document.createElement('option');
+                    option.value = annee;
+                    option.textContent = annee;
+                    selectAnnee.appendChild(option);
+                }});
+                selectAnnee.disabled = false;
+                currentAnnee = annees[0];
+                selectAnnee.value = currentAnnee;
+            }} else {{
+                selectAnnee.innerHTML = '<option value="">Aucune donnée</option>';
+                selectAnnee.disabled = true;
+                currentAnnee = '';
+            }}
+        }}
 
-    titre = f"Performance ferroviaire : {gare or data['Départ'].iloc[0]} → {ville} en {annee}"
+        function mettreAJourGraphique() {{
+            if (!currentVille) {{
+                document.getElementById('graphique').innerHTML = '<div class="loading">Sélectionnez une ville pour afficher le graphique</div>';
+                return;
+            }}
 
-    fig.update_layout(
-        title=titre,
-        barmode='stack',
-        xaxis_title='Mois',
-        yaxis_title='Nombre de trains',
-        legend=dict(x=0.02, y=0.98)
-    )
+            // Filtrer les données
+            let donneesFiltrees = toutesDonnees.filter(d => d.Ville === currentVille);
+            
+            if (currentGare) {{
+                donneesFiltrees = donneesFiltrees.filter(d => d.Départ === currentGare);
+            }}
+            
+            if (currentAnnee) {{
+                donneesFiltrees = donneesFiltrees.filter(d => d.Annee === parseInt(currentAnnee));
+            }}
 
-    return fig
+            // Grouper par mois
+            const donneesParMois = {{}};
+            donneesFiltrees.forEach(d => {{
+                if (!donneesParMois[d.Date]) {{
+                    donneesParMois[d.Date] = {{
+                        date: new Date(d.Date_iso),
+                        retard: 0,
+                        annules: 0,
+                        programmes: 0,
+                        circules: 0
+                    }};
+                }}
+                donneesParMois[d.Date].retard += d["{COLONNE_RETARD}"] || 0;
+                donneesParMois[d.Date].annules += d["{COLONNE_ANNULE}"] || 0;
+                donneesParMois[d.Date].programmes += d["{COLONNE_PROGRAMME}"] || 0;
+                donneesParMois[d.Date].circules += d["{COLONNE_CIRCULE}"] || 0;
+            }});
 
+            const donneesTriées = Object.values(donneesParMois).sort((a, b) => a.date - b.date);
 
-if __name__ == '__main__':
-    """Point d'entrée de l'application : lance le serveur Dash en mode debug."""
-    print("Application disponible sur: http://localhost:8050")
-    app.run(debug=True, port=8050)
+            if (donneesTriées.length === 0) {{
+                document.getElementById('graphique').innerHTML = '<div class="loading">Aucune donnée disponible pour cette sélection</div>';
+                return;
+            }}
 
+            // Créer le graphique Plotly
+            const traceRetard = {{
+                x: donneesTriées.map(d => d.date),
+                y: donneesTriées.map(d => d.retard),
+                name: 'Trains en retard',
+                type: 'bar',
+                marker: {{ color: '#FFC966' }}
+            }};
+
+            const traceAnnules = {{
+                x: donneesTriées.map(d => d.date),
+                y: donneesTriées.map(d => d.annules),
+                name: 'Trains annulés',
+                type: 'bar',
+                marker: {{ color: '#D4A5A5' }}
+            }};
+
+            const traceProgrammes = {{
+                x: donneesTriées.map(d => d.date),
+                y: donneesTriées.map(d => d.programmes),
+                name: 'Trains programmés',
+                type: 'scatter',
+                mode: 'lines',
+                line: {{ color: '#B5EAD7', width: 3 }}
+            }};
+
+            const traceCircules = {{
+                x: donneesTriées.map(d => d.date),
+                y: donneesTriées.map(d => d.circules),
+                name: 'Trains ayant circulé',
+                type: 'scatter',
+                mode: 'lines',
+                line: {{ color: '#2E86AB', width: 4, dash: 'dash' }}
+            }};
+
+            const layout = {{
+                title: getTitre(),
+                barmode: 'stack',
+                xaxis: {{ 
+                    title: 'Mois',
+                    tickformat: '%b %Y'
+                }},
+                yaxis: {{ title: 'Nombre de trains' }},
+                legend: {{ x: 0.02, y: 0.98 }},
+                hovermode: 'closest',
+                paper_bgcolor: 'white',
+                plot_bgcolor: 'white'
+            }};
+
+            Plotly.newPlot('graphique', [traceRetard, traceAnnules, traceProgrammes, traceCircules], layout, {{responsive: true}});
+        }}
+
+        function getTitre() {{
+            let titre = 'Performance ferroviaire : ';
+            
+            if (currentGare) {{
+                titre += currentGare + ' → ' + currentVille;
+            }} else {{
+                // Trouver la gare par défaut
+                const gares = [...new Set(toutesDonnees
+                    .filter(d => d.Ville === currentVille)
+                    .map(d => d.Départ))].sort();
+                titre += (gares[0] || '') + ' → ' + currentVille;
+            }}
+            
+            if (currentAnnee) {{
+                titre += ' en ' + currentAnnee;
+            }}
+            
+            return titre;
+        }}
+    </script>
+</body>
+</html>
+'''
+
+# Sauvegarde
+with open("graph_interactif_retard_intercites.html","w",encoding="utf-8") as f:
+    f.write(html_content)
