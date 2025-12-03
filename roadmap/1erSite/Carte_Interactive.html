@@ -19,6 +19,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+// Initialisation de la carte
 const map = L.map('map').setView([43.6, 2.2], 7);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -26,6 +27,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
 }).addTo(map);
 
+// Contour de l’Occitanie
 const geojsonUrl = "https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/regions-version-simplifiee.geojson";
 const styleOccitanie = { color: "#d62828", weight: 2, fillOpacity: 0 };
 
@@ -38,6 +40,10 @@ fetch(geojsonUrl)
         map.fitBounds(layer.getBounds());
     });
 
+// Dossier local où Pooch a mis les CSV
+const CSV_DIR = "data/";
+
+// Liste des gares avec chemins CSV
 const gares = [
     { nom: "Albi", lat: 43.9283, lon: 2.1460, csv: "albi_retard_arrivee_intercites.csv" },
     { nom: "Bayonne", lat: 43.4926, lon: -1.4747, csv: "bayonne_retard_arrivee_intercites.csv" },
@@ -51,8 +57,9 @@ const gares = [
     { nom: "Toulouse-Matabiau", lat: 43.6110, lon: 1.4553, csv: "toulouse_matabiau_retard_arrivee_intercites.csv" }
 ];
 
+// Fonction pour lire un CSV local
 async function readCSV(csvFile) {
-    const text = await fetch(csvFile).then(r => r.text());
+    const text = await fetch(CSV_DIR + csvFile).then(r => r.text());
     const lines = text.split('\n').filter(l => l.trim() !== '');
     const headers = lines[0].split(';');
     return lines.slice(1).map(line => {
@@ -63,6 +70,7 @@ async function readCSV(csvFile) {
     });
 }
 
+// Affichage du graphique dans le popup
 async function showChart(marker, csvFile, gareName) {
     const popupContent = `<canvas class="popup-chart"></canvas>`;
     marker.bindPopup(popupContent, { maxWidth: 650 }).openPopup();
@@ -70,17 +78,15 @@ async function showChart(marker, csvFile, gareName) {
     const data = await readCSV(csvFile);
     const labels = data.map(row => row["Date"]);
 
-    // Couleur uniforme pour toutes les gares
     const lineColor = 'rgba(54,162,235,1)';
     const fillColor = 'rgba(54,162,235,0.2)';
 
     const datasets = [{
         label: "Trains circulés",
         data: data.map(row => {
-            // Utilisation de la même logique pour toutes les gares
             const planned = parseFloat(row["Nombre de circulations prévues"] || row["Nombre de trains ayant circulé"] || 0);
             const cancelled = parseFloat(row["Nombre de trains annulés"] || 0);
-            return Math.max(planned - cancelled, 0); // jamais négatif
+            return Math.max(planned - cancelled, 0);
         }),
         borderColor: lineColor,
         backgroundColor: fillColor,
@@ -108,6 +114,7 @@ async function showChart(marker, csvFile, gareName) {
     });
 }
 
+// Ajout des markers sur la carte
 gares.forEach(g => {
     const marker = L.marker([g.lat, g.lon], { title: g.nom }).addTo(map);
     marker.on('click', () => showChart(marker, g.csv, g.nom));
@@ -115,4 +122,5 @@ gares.forEach(g => {
 </script>
 </body>
 </html>
+
 
