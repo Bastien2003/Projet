@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Retards SNCF - Visualisation Interactive</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Analyse Interactive des Retards SNCF</h1>
+
+    <div class="controls">
+        <label>Mode :</label>
+        <select id="mode">
+            <option value="ville">Par ville</option>
+            <option value="cause">Par cause</option>
+        </select>
+
+        <label>Choix :</label>
+        <select id="choix"></select>
+    </div>
+
+    <div id="graph"></div>
+</body>
+</html>
