@@ -1,125 +1,108 @@
-// --- 1) Charger tous les CSV depuis le dossier /data ---
-async function loadCSVs() {
-    const files = [
-        "albi_retard_arrivee_intercites.csv",
-        "bayonne_retard_arrivee_intercites.csv",
-        "beziers_retard_arrivee_intercites.csv",
-        "cerbere_retard_arrivee_intercites.csv",
-        "frequentation_gares_occitanie.csv",
-        "latour_de_carol_retard_arrivee_intercites.csv",
-        "liste_gares_occitanie.csv",
-        "montpellier_retard_arrivee+depart_tgv.csv",
-        "nimes_retard_arrivee+depart_tgv.csv",
-        "nimes_retard_arrivee_intercites.csv",
-        "occitanie_retard_arrivee.csv",
-        "perpignan_retard_arrivee+depart_tgv.csv",
-        "retard_france_intercites.csv",
-        "tarbes_retard_arrivee_intercites.csv",
-        "temps_moyen_narbonne-paris.csv",
-        "temps_moyen_occitanie-paris.csv",
-        "temps_moyens_montpellier-paris.csv",
-        "toulouse_matabiau_retard_arrivee+depart_tgv.csv",
-        "toulouse_matabiau_retard_arrivee_intercites.csv"
-    ];
+// --- Fonction pour charger un CSV et retourner un tableau d'objets ---
+async function loadCSV(url, villeFromFile = null) {
+    const res = await fetch(url);
+    const text = await res.text();
+    const rows = text.trim().split("\n").map(r => r.split(","));
 
-    let allData = [];
+    const headers = rows[0].map(h => h.trim().toLowerCase());
+    const dataRows = rows.slice(1);
 
-    for (const file of files) {
-        const response = await fetch("data/" + file);
-        const text = await response.text();
-
-        // CSV → tableau d’objets
-        const rows = text.split("\n").map(r => r.split(","));
-
-        const headers = rows[0].map(h => h.trim().toLowerCase());
-        const dataRows = rows.slice(1);
-
-        dataRows.forEach(r => {
-            let obj = {};
-            headers.forEach((h, i) => obj[h] = r[i]);
-
-            // Ajout de la ville depuis le nom de fichier si absente
-            if (!obj["ville"]) {
-                obj["ville"] = file.split("_")[0];
-            }
-
-            if (obj["retard"]) obj["retard"] = parseFloat(obj["retard"]);
-            allData.push(obj);
-        });
-    }
-
-    return allData;
+    const data = dataRows.map(r => {
+        let obj = {};
+        headers.forEach((h, i) => obj[h] = r[i]);
+        if (villeFromFile && !obj["ville"]) obj["ville"] = villeFromFile;
+        if (obj["retard"]) obj["retard"] = parseFloat(obj["retard"].replace(",", "."));
+        return obj;
+    });
+    return data;
 }
+
+// --- Liste des fichiers CSV (tous ceux dans base_de_donnees_version_csv) ---
+const files = [
+    "albi_retard_arrivee_intercites.csv",
+    "bayonne_retard_arrivee_intercites.csv",
+    "beziers_retard_arrivee_intercites.csv",
+    "cerbere_retard_arrivee_intercites.csv",
+    "latour_de_carol_retard_arrivee_intercites.csv",
+    "montpellier_retard_arrivee+depart_tgv.csv",
+    "nimes_retard_arrivee+depart_tgv.csv",
+    "nimes_retard_arrivee_intercites.csv",
+    "occitanie_retard_arrivee.csv",
+    "perpignan_retard_arrivee+depart_tgv.csv",
+    "retard_france_intercites.csv",
+    "tarbes_retard_arrivee_intercites.csv",
+    "toulouse_matabiau_retard_arrivee+depart_tgv.csv",
+    "toulouse_matabiau_retard_arrivee_intercites.csv"
+];
+
+const folder = "data/base_de_donnees_version_csv/";
 
 let DATA = [];
 
 async function init() {
-    DATA = await loadCSVs();
+    for (const f of files) {
+        // Déduire la ville du nom du fichier si possible
+        const villeFromFile = f.split("_")[0];
+        const csvData = await loadCSV(folder + f, villeFromFile);
+        DATA = DATA.concat(csvData);
+    }
 
-    const mode = document.getElementById("mode");
-    const choix = document.getElementById("choix");
+    const modeSelect = document.getElementById("mode");
+    const choixSelect = document.getElementById("choix");
 
-    mode.addEventListener("change", updateDropdown);
-    choix.addEventListener("change", updateGraph);
+    modeSelect.addEventListener("change", updateDropdown);
+    choixSelect.addEventListener("change", updateGraph);
 
     updateDropdown();
 }
 
-// --- 2) Mettre à jour le second menu ---
+// --- Mettre à jour le menu déroulant ---
 function updateDropdown() {
     const mode = document.getElementById("mode").value;
-    const choix = document.getElementById("choix");
+    const choixSelect = document.getElementById("choix");
 
     let values = [];
-
     if (mode === "ville") {
         values = [...new Set(DATA.map(d => d.ville))].sort();
     } else {
         values = [...new Set(DATA.map(d => d.cause))].sort();
     }
 
-    choix.innerHTML = values.map(v => `<option value="${v}">${v}</option>`).join("");
-
+    choixSelect.innerHTML = values.map(v => `<option value="${v}">${v}</option>`).join("");
     updateGraph();
 }
 
-// --- 3) Mettre à jour le graphique ---
+// --- Mettre à jour le graphique ---
 function updateGraph() {
     const mode = document.getElementById("mode").value;
     const choix = document.getElementById("choix").value;
 
-    let filtered = DATA.filter(d => d.retard && d.cause);
+    const filtered = DATA.filter(d => d.retard && d.cause);
 
     let x = [];
     let y = [];
+    let title = "";
 
     if (mode === "ville") {
         const subset = filtered.filter(d => d.ville === choix);
-
         const group = {};
         subset.forEach(d => {
             if (!group[d.cause]) group[d.cause] = [];
             group[d.cause].push(d.retard);
         });
-
         x = Object.keys(group);
         y = x.map(k => group[k].reduce((a, b) => a + b) / group[k].length);
-
-        var title = `Retard moyen par cause – ${choix}`;
-
+        title = `Retard moyen par cause – ${choix}`;
     } else {
         const subset = filtered.filter(d => d.cause === choix);
-
         const group = {};
         subset.forEach(d => {
             if (!group[d.ville]) group[d.ville] = [];
             group[d.ville].push(d.retard);
         });
-
         x = Object.keys(group);
         y = x.map(k => group[k].reduce((a, b) => a + b) / group[k].length);
-
-        var title = `Retard moyen par ville – Cause : ${choix}`;
+        title = `Retard moyen par ville – Cause : ${choix}`;
     }
 
     Plotly.newPlot("graph", [{
