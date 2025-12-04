@@ -32,7 +32,6 @@ Projet/
  ├── diagramme/             
  ├── image/       
  ├── roadmap/1erSite             # Site web ou pages HTML
- └── README.md            # Documentation principale
 
 
 
