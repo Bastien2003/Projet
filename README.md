@@ -32,8 +32,8 @@ Projet/
  ├── data/                
  ├── diagramme/             
  ├── image/       
- ├── roadmap/1erSite    # Site web et pages HTML
- ├── script/ 
+ ├── roadmap/1erSite    # Site web et pages HTML                
+ ├── script/                    
  ├── tests/ 
 
 
