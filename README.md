@@ -28,10 +28,13 @@ Grâce à des visualisations interactives, des diagrammes et des graphes, ce pro
 🗂️ Structure du projet
 
 Projet/
+
  ├── data/                
  ├── diagramme/             
  ├── image/       
- ├── roadmap/1erSite             # Site web ou pages HTML
+ ├── roadmap/1erSite    # Site web et pages HTML
+ ├── script/ 
+ ├── tests/ 
 
 
 
