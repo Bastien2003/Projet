@@ -7,10 +7,14 @@ import webbrowser
 # ============================================================
 # 1 — CHEMIN VERS LE DOSSIER DES CSV
 # ============================================================
-DATA_FOLDER = os.path.join("..", "data", "base_de_donnees_version_csv")
+
+# Chemin du dossier des données, relatif au script actuel
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_FOLDER = os.path.join(SCRIPT_DIR, "data")  # <-- docs/data
 
 if not os.path.isdir(DATA_FOLDER):
     raise ValueError(f"Le dossier n'existe pas : {DATA_FOLDER}")
+
 
 def charger_csv(data_folder):
     fichiers = [f for f in os.listdir(data_folder) if f.endswith(".csv")]
@@ -107,8 +111,8 @@ for ville in villes:
     ))
 
 fig.update_layout(
-    title=f"Retards et causes – {ville_defaut}",
-    xaxis_title="Types de retard / Causes",
+    title=f"Nombre total de Voyageurs – {ville_defaut}",
+    xaxis_title="Nombre Total de Voyageurs",
     yaxis_title="Valeur moyenne",
     updatemenus=[{
         "buttons": buttons,
