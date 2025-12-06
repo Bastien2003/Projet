@@ -24,6 +24,13 @@ Grâce à des visualisations interactives, des diagrammes et des graphes, ce pro
 - Produire des visualisations lisibles pour différents publics
 
 
+🌐 Site Web
+
+Le site est disponible à l’adresse suivante:
+
+https://bastien2003.github.io/Projet/
+
+
 
 🗂️ Structure du projet
 
