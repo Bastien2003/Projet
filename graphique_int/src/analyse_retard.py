@@ -107,8 +107,8 @@ for ville in villes:
     ))
 
 fig.update_layout(
-    title=f"Retards et causes – {ville_defaut}",
-    xaxis_title="Types de retard / Causes",
+    title=f"Nombre total de voyageurs – {ville_defaut}",
+    xaxis_title="Nombre total de voyageurs",
     yaxis_title="Valeur moyenne",
     updatemenus=[{
         "buttons": buttons,
