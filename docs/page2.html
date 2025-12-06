@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Retards des TGV</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: #f0f8ff;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+
+        h1, h2, h3, h4 {
+            color: #2e8b57;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        h2 {
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin: 5px 0 15px 0;
+        }
+
+        ul {
+            font-size: 16px;
+            list-style-position: inside;
+            margin-bottom: 15px;
+        }
+
+        nav {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #2e8b57;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .graph-container {
+            width: 100%;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .graph-iframe {
+            width: 100%;
+            border: none;
+            display: block;
+        }
+
+        footer {
+            margin-top: 30px;
+        }
+
+        /* Responsive mobile */
+        @media (max-width: 768px) {
+            body {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Retards des TGV</h1>
+
+    <nav>
+        <a href="index.html" title="Accueil">Accueil</a>
+        <a href="page1.html" title="Analyse Intercités">Intercités</a>
+        <a href="page3.html" title="Causes des retards">Causes</a>
+    </nav>
+
+    <p>Présentation générale des performances TGV et analyse des retards.</p>
+    <hr>
+
+    <h2>Graphique 1 : Retards / Annulations</h2>
+    <div class="graph-container">
+        <iframe class="graph-iframe" id="graph1" src="Graphe_retards_moyen_TGV.html" title="Graphique Retards / Annulations TGV"></iframe>
+    </div>
+
+    <ul>
+        <li>Point 1 important</li>
+        <li>Point 2 important</li>
+    </ul>
+
+    <h2>Graphique 2 : Performance TGV</h2>
+    <div class="graph-container">
+        <iframe class="graph-iframe" id="graph2" src="Graphe_retards_moyen_TGV.html" title="Graphique Performance TGV"></iframe>
+    </div>
+
+    <h3>Comment interpréter le graphique</h3>
+    <ul>
+        <li>Point clé 1</li>
+        <li>Point clé 2</li>
+        <li>Point clé 3</li>
+        <li>Point clé 4</li>
+    </ul>
+
+    <h4>Résumé et conclusions</h4>
+    <ul>
+        <li>Conclusion 1</li>
+        <li>Conclusion 2</li>
+        <li>Conclusion 3</li>
+    </ul>
+
+    <footer>
+        <hr>
+        <p style="text-align:center;">Données SNCF et analyse TGV - © 2025</p>
+    </footer>
+
+    <!-- Script pour ajuster dynamiquement la hauteur des iframes -->
+    <script>
+        function adjustIframeHeight(iframe) {
+            try {
+                // Ajuste la hauteur selon le contenu
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                if (doc) {
+                    iframe.style.height = doc.body.scrollHeight + 'px';
+                }
+            } catch(e) {
+                // Si CORS empêche l'accès, définir une hauteur par défaut
+                iframe.style.height = '800px';
+            }
+        }
+
+        const iframes = document.querySelectorAll('.graph-iframe');
+        iframes.forEach(frame => {
+            frame.addEventListener('load', () => adjustIframeHeight(frame));
+            // Réajustement à chaque redimensionnement de la fenêtre
+            window.addEventListener('resize', () => adjustIframeHeight(frame));
+        });
+    </script>
+
+</body>
+</html>
+
+

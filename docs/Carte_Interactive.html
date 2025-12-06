@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carte interactive — Occitanie</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <style>
+        #map { height: 100vh; width: 100%; margin: 0; padding: 0; }
+        body { margin: 0; padding: 0; }
+        .popup-chart { width: 600px; height: 400px; display: block; }
+        .leaflet-popup-content { max-height: 450px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Initialisation de la carte
+const map = L.map('map').setView([43.6, 2.2], 7);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap'
+}).addTo(map);
+
+// Contour de l’Occitanie
+const geojsonUrl = "https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/regions-version-simplifiee.geojson";
+const styleOccitanie = { color: "#d62828", weight: 2, fillOpacity: 0 };
+
+fetch(geojsonUrl)
+    .then(r => r.json())
+    .then(data => {
+        const occitanie = data.features.filter(f => f.properties.nom === "Occitanie");
+        const occ = { type: "FeatureCollection", features: occitanie };
+        const layer = L.geoJSON(occ, { style: styleOccitanie }).addTo(map);
+        map.fitBounds(layer.getBounds());
+    });
+
+// Dossier local où Pooch a mis les CSV
+const CSV_DIR = "data/";
+
+// Liste des gares avec chemins CSV
+const gares = [
+    { nom: "Albi", lat: 43.9283, lon: 2.1460, csv: "albi_retard_arrivee_intercites.csv" },
+    { nom: "Bayonne", lat: 43.4926, lon: -1.4747, csv: "bayonne_retard_arrivee_intercites.csv" },
+    { nom: "Béziers", lat: 43.3443, lon: 3.2158, csv: "beziers_retard_arrivee_intercites.csv" },
+    { nom: "Cerbère", lat: 42.4428, lon: 3.1649, csv: "cerbere_retard_arrivee_intercites.csv" },
+    { nom: "Latour-de-Carol", lat: 42.4530, lon: 1.8635, csv: "latour_de_carol_retard_arrivee_intercites.csv" },
+    { nom: "Montpellier Saint-Roch", lat: 43.6045, lon: 3.8780, csv: "montpellier_retard_arrivee+depart_tgv.csv" },
+    { nom: "Nîmes", lat: 43.8340, lon: 4.3601, csv: "nimes_retard_arrivee_intercites.csv" },
+    { nom: "Perpignan", lat: 42.6976, lon: 2.8911, csv: "perpignan_retard_arrivee+depart_tgv.csv" },
+    { nom: "Tarbes", lat: 43.2320, lon: 0.0713, csv: "tarbes_retard_arrivee_intercites.csv" },
+    { nom: "Toulouse-Matabiau", lat: 43.6110, lon: 1.4553, csv: "toulouse_matabiau_retard_arrivee_intercites.csv" }
+];
+
+// Fonction pour lire un CSV local
+async function readCSV(csvFile) {
+    const text = await fetch(CSV_DIR + csvFile).then(r => r.text());
+    const lines = text.split('\n').filter(l => l.trim() !== '');
+    const headers = lines[0].split(';');
+    return lines.slice(1).map(line => {
+        const cols = line.split(';');
+        const obj = {};
+        headers.forEach((h, i) => obj[h.trim()] = cols[i].trim());
+        return obj;
+    });
+}
+
+// Affichage du graphique dans le popup
+async function showChart(marker, csvFile, gareName) {
+    const popupContent = `<canvas class="popup-chart"></canvas>`;
+    marker.bindPopup(popupContent, { maxWidth: 650 }).openPopup();
+
+    const data = await readCSV(csvFile);
+    const labels = data.map(row => row["Date"]);
+
+    const lineColor = 'rgba(54,162,235,1)';
+    const fillColor = 'rgba(54,162,235,0.2)';
+
+    const datasets = [{
+        label: "Trains circulés",
+        data: data.map(row => {
+            const planned = parseFloat(row["Nombre de circulations prévues"] || row["Nombre de trains ayant circulé"] || 0);
+            const cancelled = parseFloat(row["Nombre de trains annulés"] || 0);
+            return Math.max(planned - cancelled, 0);
+        }),
+        borderColor: lineColor,
+        backgroundColor: fillColor,
+        fill: true,
+        borderWidth: 2,
+        tension: 0.3,
+        pointRadius: 3
+    }];
+
+    const ctx = marker.getPopup().getElement().querySelector("canvas").getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets },
+        options: { 
+            responsive: true,
+            plugins: { 
+                legend: { position: 'top' },
+                title: { display: true, text: `Nombre de trains à ${gareName}` }
+            },
+            scales: { 
+                x: { title: { display: true, text: 'Date' } },
+                y: { title: { display: true, text: 'Nombre de trains' }, beginAtZero: true }
+            }
+        }
+    });
+}
+
+// Ajout des markers sur la carte
+gares.forEach(g => {
+    const marker = L.marker([g.lat, g.lon], { title: g.nom }).addTo(map);
+    marker.on('click', () => showChart(marker, g.csv, g.nom));
+});
+</script>
+</body>
+</html>
+
+
