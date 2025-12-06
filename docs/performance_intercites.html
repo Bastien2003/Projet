@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Performance Intercités Occitanie</title>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+<h1>Performance Intercités - Occitanie</h1>
+<div id="graph" style="width:100%;height:700px;"></div>
+<script>
+const data = [{"Départ": "BAYONNE", "Arrivée": "TOULOUSE-MATABIAU", "Trains_programmés": 2217, "Trains_circulés": 2136, "Trains_retard": 270, "Trains_annulés": 81, "Taux_régularité": 81.36740356186358, "Taux_annulation": 3.7, "Taux_retard": 12.6}, {"Départ": "CLERMONT-FERRAND", "Arrivée": "BÉZIERS", "Trains_programmés": 5721, "Trains_circulés": 5642, "Trains_retard": 345, "Trains_annulés": 79, "Taux_régularité": 93.66130718144812, "Taux_annulation": 1.4, "Taux_retard": 6.1}, {"Départ": "CLERMONT-FERRAND", "Arrivée": "NÎMES", "Trains_programmés": 1510, "Trains_circulés": 1456, "Trains_retard": 104, "Trains_annulés": 54, "Taux_régularité": 81.53735390938466, "Taux_annulation": 3.6, "Taux_retard": 7.1}, {"Départ": "HENDAYE", "Arrivée": "TOULOUSE-MATABIAU", "Trains_programmés": 10113, "Trains_circulés": 9897, "Trains_retard": 1132, "Trains_annulés": 216, "Taux_régularité": 81.04945684857644, "Taux_annulation": 2.1, "Taux_retard": 11.4}, {"Départ": "PARIS-AUSTERLITZ", "Arrivée": "CERBERE", "Trains_programmés": 5190, "Trains_circulés": 5118, "Trains_retard": 537, "Trains_annulés": 72, "Taux_régularité": 85.35534909890501, "Taux_annulation": 1.4, "Taux_retard": 10.5}, {"Départ": "PARIS-AUSTERLITZ", "Arrivée": "LATOUR-DE-CAROL", "Trains_programmés": 1914, "Trains_circulés": 1732, "Trains_retard": 209, "Trains_annulés": 182, "Taux_régularité": 85.34270045149185, "Taux_annulation": 9.5, "Taux_retard": 12.1}, {"Départ": "PARIS-AUSTERLITZ", "Arrivée": "RODEZ/ALBI", "Trains_programmés": 1666, "Trains_circulés": 1592, "Trains_retard": 140, "Trains_annulés": 74, "Taux_régularité": 83.21866768438832, "Taux_annulation": 4.4, "Taux_retard": 8.8}, {"Départ": "PARIS-AUSTERLITZ", "Arrivée": "TARBES", "Trains_programmés": 371, "Trains_circulés": 370, "Trains_retard": 18, "Trains_annulés": 1, "Taux_régularité": 93.77882872805642, "Taux_annulation": 0.3, "Taux_retard": 4.9}, {"Départ": "PARIS-AUSTERLITZ", "Arrivée": "TOULOUSE-MATABIAU", "Trains_programmés": 8541, "Trains_circulés": 8491, "Trains_retard": 1235, "Trains_annulés": 50, "Taux_régularité": 85.13775726205307, "Taux_annulation": 0.6, "Taux_retard": 14.5}, {"Départ": "TOULOUSE-MATABIAU", "Arrivée": "BAYONNE", "Trains_programmés": 2227, "Trains_circulés": 2148, "Trains_retard": 318, "Trains_annulés": 79, "Taux_régularité": 79.89521799428171, "Taux_annulation": 3.5, "Taux_retard": 14.8}];
+
+// Extraire les gares uniques pour une palette
+// Extraire les gares uniques pour une palette
+const garesDepart = [...new Set(data.map(d => d.Départ))];
+
+// Palette 10 couleurs
+const couleurs = [
+    "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728",
+    "#9467bd", "#8c564b", "#e377c2", "#7f7f7f",
+    "#bcbd22", "#17becf"
+];
+
+const colorMap = {};
+garesDepart.forEach((gare, i) => {
+    colorMap[gare] = couleurs[i % couleurs.length];
+});
+
+// Créer une trace par gare de départ
+const traces = garesDepart.map(gare => {
+    const rows = data.filter(d => d.Départ === gare);
+
+    return {
+        name: gare,
+        x: rows.map(d => d.Trains_programmés),
+        y: rows.map(d => d.Taux_régularité),
+        mode: 'markers',
+        marker: {
+            size: rows.map(d => Math.sqrt(d.Trains_retard) * 3),
+            color: colorMap[gare],
+            sizemode: 'area',
+            sizeref:
+                2.0 * Math.max(...data.map(d => Math.sqrt(d.Trains_retard))) / 40 ** 2,
+            line: { width: 1, color: 'DarkSlateGrey' }
+        },
+        text: rows.map(d => d.Arrivée),
+        customdata: rows.map(d => [
+            d.Départ, d.Trains_programmés, d.Trains_circulés,
+            d.Taux_régularité, d.Trains_retard, d.Trains_annulés,
+            d.Taux_annulation, d.Taux_retard
+        ]),
+        hovertemplate:
+            "<b>%{text}</b><br>Gare de Départ: %{customdata[0]}<br>" +
+            "Programmes: %{customdata[1]:,}<br>" +
+            "Circulés: %{customdata[2]:,}<br>" +
+            "Taux régularité: %{customdata[3]:.1f}%<br>" +
+            "Retard: %{customdata[4]:,}<br>" +
+            "Annulés: %{customdata[5]:,}<br>" +
+            "Taux annulation: %{customdata[6]:.1f}%<br>" +
+            "Taux retard: %{customdata[7]:.1f}%<extra></extra>"
+    };
+});
+
+const minY = Math.min(...data.map(d => d.Taux_régularité));
+const maxY = Math.max(...data.map(d => d.Taux_régularité));
+
+const layout = {
+    title: "Performance du réseau Intercités d'Occitanie",
+    xaxis: { title: "Trains programmés", tickformat: ",d" },
+    yaxis: { title: "Taux de régularité (%)",  range: [minY - 2, maxY + 2] },
+    hovermode: "closest"
+};
+
+Plotly.newPlot('graph', traces, layout);
+</script>
+</body>
+</html>
