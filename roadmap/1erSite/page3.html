@@ -1,48 +1,91 @@
- <h2>titre du deuxieme graphe si il existe </h2>
-    <p> paragraphe blablabla
-    </p>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Causes des retards</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: #f0f8ff;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
 
-    <!-- GRAPH 2 : Performance Intercités -->
-    <div style="width:100%; overflow:hidden;">
-        <iframe src="Graphe_retards_moyen_TGV.html"
-                style="width:130%; height:800px; transform:scale(0.75); transform-origin:top left;">
-        </iframe>
-    </div>
-    <h3 style="text-align: left;">Comment interpréter le graphique</h3>
-    <p style="text-align: left; font-size: 16px;">
-balblabla
-    </p>
-    <ul style="text-align: left; font-size: 16px; list-style-position: inside;">
-      <li><strong> si besoin </li>
-      <li><strong> si besoin </li>
-      <li><strong>why not  :</strong> blabla.</li>
-      <li><strong>oui </strong> non</li>
-    </ul>
-    <p style="text-align: left; font-size: 16px;">
-bla
-    </p>
+        h1, h2, h3, h4 {
+            color: #2e8b57;
+        }
 
-    <h3  style="text-align: left;"> blablabla</h3>
-    <p style="text-align: left; font-size: 16px;">
-blablabla</p>
+        h2 {
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
 
-    <h4 style="text-align: left;">blablabla</h4>
-    <ul style="text-align: left; font-size: 16px; list-style-position: inside;">
-      <li>blablabla</li>
-      <li>blabla</li>
-      <li>blablabla</li>
-    </ul>
+        p {
+            margin: 5px 0 15px 0;
+        }
 
-    <h4 style="text-align: left;">bla</h4>
-    <ul style="text-align: left; font-size: 16px; list-style-position: inside;">
-      <li>oui</li>
-      <li>oui </li>
-      <li>oui</li>
-    </ul>
+        nav a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #2e8b57;
+            font-weight: bold;
+        }
 
-    <p style="text-align: left; font-size: 16px;">
-bla
-    </p>
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        iframe.graph {
+            display: block;
+            margin: 0 auto 20px auto;
+            border: none;
+            width: 100%;
+            height: 500px;
+            overflow: hidden; /* supprime la barre de scroll */
+        }
+
+        ul {
+            font-size: 16px;
+            list-style-position: inside;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Causes des retards</h1>
+
+<nav>
+    <a href="index.html">Accueil</a>
+    <a href="page1.html">Intercités</a>
+    <a href="page2.html">TGV</a>
+</nav>
+
+<p>Cette page présente les causes principales des retards et perturbations sur les lignes ferroviaires.</p>
+
+<hr>
+
+<h2>Graphique : Performance TGV</h2>
+<p>Analyse basée sur le retard moyen par gare.</p>
+
+<div>
+    <iframe class="graph" src="../../graphique_int/src/graphique.html"></iframe>
+</div>
+
+
+<!-- Script pour ajuster automatiquement la hauteur de l'iframe -->
+<script>
+const iframe = document.querySelector('iframe.graph');
+iframe.onload = () => {
+    iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+};
+</script>
+
+<footer>
+    <hr>
+    <p style="text-align:center;">Données SNCF et analyse Intercités - © 2025</p>
+</footer>
 
 </body>
 </html>

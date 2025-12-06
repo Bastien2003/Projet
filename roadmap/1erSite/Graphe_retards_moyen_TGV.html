@@ -11,20 +11,22 @@
             padding: 20px;
             background: #f5f5f5;
         }
+
         h1 {
             text-align: center;
         }
-        #container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+
+        .graph-container {
+            width: 100%;
+            height: 500px;
+            position: relative;
         }
+
         canvas {
-            max-width: 100%;
+            width: 100% !important;
+            height: 100% !important;
         }
+
         .note {
             margin-top: 10px;
             font-size: 0.9rem;
@@ -33,81 +35,61 @@
     </style>
 </head>
 <body>
-<header>
-    <h1>Retard moyen des TGV</h1>
-    <nav>
-        <a href="index.html">Accueil</a>
-        <a href="Carte_interactive.html">Page 1</a>
-        <a href="graph_interactif_retard_annulation_intercité.html">Page 2</a>
-    </nav>
-</header>
 
 <div id="container">
     <h1>Retard moyen des TGV par gare</h1>
-    <p>Graphique basé sur les gares TVG de Nîmes, Montpellier, Perpignan et Toulouse Matabiau (retard moyen au départ et à l'arrivée).</p>
+    <p>Graphique basé sur les gares TGV de Nîmes, Montpellier, Perpignan et Toulouse Matabiau (retard moyen au départ et à l'arrivée).</p>
 
-    <canvas id="retardsChart" height="120"></canvas>
+    <div class="graph-container">
+        <canvas id="retardsChart"></canvas>
+    </div>
 
     <p class="note">
-        Observation: On remarque que en moyenne les retards au départ est d'environ 3 minute par gare,
-                     cependant à l'arrivée le temps de retard varie d'un trajet à l'autre mais reste toujours supérieur à celui du départ.
+        Observation: en moyenne, les retards au départ sont d'environ 3 minutes par gare,
+        cependant à l'arrivée le temps de retard varie d'un trajet à l'autre mais reste toujours supérieur à celui du départ.
     </p>
 </div>
 
 <script>
-// Liste des fichiers CSV à charger (un fichier = une gare)
+// Liste des fichiers CSV dans le dossier data/
 const csvFiles = [
-    "nimes_retard_arrivee+depart_tgv.csv",
-    "montpellier_retard_arrivee+depart_tgv.csv",
-    "perpignan_retard_arrivee+depart_tgv.csv",
-    "toulouse_matabiau_retard_arrivee+depart_tgv.csv"
+    "data/nimes_retard_arrivee+depart_tgv.csv",
+    "data/montpellier_retard_arrivee+depart_tgv.csv",
+    "data/perpignan_retard_arrivee+depart_tgv.csv",
+    "data/toulouse_matabiau_retard_arrivee+depart_tgv.csv"
 ];
 
-// Noms exacts des colonnes dans les CSV
 const COL_GARE = "Gare de départ";
 const COL_RETARD_DEP = "Retard moyen de tous les trains au départ";
 const COL_RETARD_ARR = "Retard moyen de tous les trains à l'arrivée";
 
-
 async function main() {
-    const labels = [];         // Nom des gares
-    const moyennesDep = [];    // Retard moyen au départ
-    const moyennesArr = [];    // Retard moyen à l'arrivée
+    const labels = [];
+    const moyennesDep = [];
+    const moyennesArr = [];
 
     for (const file of csvFiles) {
         try {
             const text = await fetchCsv(file);
             const rows = parseCsv(text, ";");
-            if (rows.length === 0) continue;
+            if (!rows.length) continue;
 
-            // gare = première ligne de la colonne "Gare de départ",
-            // comme dans df["Gare de départ"].iloc[0]
             const gare = rows[0][COL_GARE] || file;
 
             const valsDep = [];
             const valsArr = [];
 
-            // On parcourt toutes les lignes du fichier (comme df[col].mean())
             rows.forEach(row => {
-                const depStr = row[COL_RETARD_DEP];
-                const arrStr = row[COL_RETARD_ARR];
-
-                if (depStr !== undefined && depStr !== "") {
-                    const vDep = parseFloat(depStr.replace(",", "."));
-                    if (!isNaN(vDep)) valsDep.push(vDep);
-                }
-
-                if (arrStr !== undefined && arrStr !== "") {
-                    const vArr = parseFloat(arrStr.replace(",", "."));
-                    if (!isNaN(vArr)) valsArr.push(vArr);
-                }
+                const dep = parseFloat((row[COL_RETARD_DEP] || "").replace(",", "."));
+                const arr = parseFloat((row[COL_RETARD_ARR] || "").replace(",", "."));
+                if (!isNaN(dep)) valsDep.push(dep);
+                if (!isNaN(arr)) valsArr.push(arr);
             });
 
-            // Si on a des données, on calcule la moyenne
-            if (valsDep.length > 0 || valsArr.length > 0) {
+            if (valsDep.length || valsArr.length) {
                 labels.push(gare);
-                moyennesDep.push(moyenne(valsDep));
-                moyennesArr.push(moyenne(valsArr));
+                moyennesDep.push(valsDep.length ? moyenne(valsDep) : 0);
+                moyennesArr.push(valsArr.length ? moyenne(valsArr) : 0);
             }
         } catch (e) {
             console.error("Erreur lors du chargement de", file, e);
@@ -117,46 +99,30 @@ async function main() {
     dessinerGraphe(labels, moyennesDep, moyennesArr);
 }
 
-// Charge le contenu d'un CSV 
 async function fetchCsv(path) {
     const response = await fetch(path);
-    if (!response.ok) {
-        throw new Error("HTTP " + response.status);
-    }
+    if (!response.ok) throw new Error("HTTP " + response.status);
     return await response.text();
 }
 
-// Parseur CSV 
 function parseCsv(text, sep) {
     const lines = text.trim().split(/\r?\n/);
     if (lines.length < 2) return [];
-
     const headers = lines[0].split(sep).map(h => h.trim());
-    const rows = [];
-
-    for (let i = 1; i < lines.length; i++) {
-        if (!lines[i].trim()) continue;
-        const cols = lines[i].split(sep);
+    return lines.slice(1).map(line => {
+        const cols = line.split(sep);
         const obj = {};
-        headers.forEach((h, idx) => {
-            obj[h] = (cols[idx] || "").trim();
-        });
-        rows.push(obj);
-    }
-    return rows;
+        headers.forEach((h, i) => obj[h] = (cols[i] || "").trim());
+        return obj;
+    });
 }
 
-// Calcul de la moyenne
 function moyenne(arr) {
-    if (!arr || arr.length === 0) return 0;
-    const sum = arr.reduce((a, b) => a + b, 0);
-    return sum / arr.length;
+    return arr.reduce((a,b)=>a+b,0)/arr.length;
 }
 
-// Dessin du graphique avec Chart.js
 function dessinerGraphe(labels, dataDep, dataArr) {
     const ctx = document.getElementById("retardsChart").getContext("2d");
-
     new Chart(ctx, {
         type: "bar",
         data: {
@@ -164,53 +130,57 @@ function dessinerGraphe(labels, dataDep, dataArr) {
             datasets: [
                 {
                     label: "Retard moyen au départ (min)",
-                    data: dataDep
+                    data: dataDep,
+                    backgroundColor: "rgba(46, 139, 87, 0.6)"
                 },
                 {
                     label: "Retard moyen à l'arrivée (min)",
-                    data: dataArr
+                    data: dataArr,
+                    backgroundColor: "rgba(255, 99, 132, 0.6)"
                 }
             ]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: "Minutes"
-                    }
+                    title: { display: true, text: "Minutes" },
+                    grid: { color: "#ccc" }
                 },
                 x: {
-                    title: {
-                        display: true,
-                        text: "Gare"
-                    }
+                    title: { display: true, text: "Gare" },
+                    grid: { color: "#ccc" }
                 }
             },
             plugins: {
+                legend: { position: "top" },
                 tooltip: {
                     callbacks: {
-                        label: function (context) {
-                            const v = context.parsed.y;
-                            return context.dataset.label + ": " + v.toFixed(2) + " min";
-                        }
+                        label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)} min`
                     }
-                },
-                legend: {
-                    position: "top"
-                },
-                title: {
-                    display: false
                 }
+            },
+            // Fond du canvas = fond du site
+            layout: { padding: 0 }
+        },
+        plugins: [{
+            id: 'customCanvasBackgroundColor',
+            beforeDraw: (chart) => {
+                const ctx = chart.canvas.getContext('2d');
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-over';
+                ctx.fillStyle = '#f5f5f5';
+                ctx.fillRect(0, 0, chart.width, chart.height);
+                ctx.restore();
             }
-        }
+        }]
     });
 }
 
-// On lance tout
 main();
 </script>
+
 </body>
 </html>
