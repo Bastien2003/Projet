@@ -102,7 +102,7 @@ for ville in villes:
         method="update",
         args=[
             {"y": [y_vals], "name": ville},
-            {"title": f"Retards et causes – {ville}"}
+            {"title": f"Nombre total de voyageurs – {ville}"}
         ]
     ))
 
