@@ -2,120 +2,151 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Analyse des performances TGV</title>
+    <title>Retards des TGV</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Ajustement des espacements pour page2.html */
+        body {
+            background-color: #f0f8ff;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+
+        h1, h2, h3, h4 {
+            color: #2e8b57;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
         h2 {
             margin-top: 30px;
             margin-bottom: 10px;
-            text-align: left;
-            color: #2e8b57;
         }
+
         p {
-            margin-top: 5px;
-            margin-bottom: 10px;
-            text-align: left;
+            margin: 5px 0 15px 0;
         }
-        iframe {
-            display: block;
-            margin: 0 auto 20px auto; /* centre et espace sous iframe */
+
+        ul {
+            font-size: 16px;
+            list-style-position: inside;
+            margin-bottom: 15px;
+        }
+
+        nav {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #2e8b57;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .graph-container {
+            width: 100%;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .graph-iframe {
+            width: 100%;
             border: none;
+            display: block;
         }
-        hr {
-            margin: 20px 0;
-            border-color: #ccc;
+
+        footer {
+            margin-top: 30px;
         }
-        body {
-            background-color: #f0f8ff; /* fond du site */
+
+        /* Responsive mobile */
+        @media (max-width: 768px) {
+            body {
+                margin: 10px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <h1>Analyse des retards et performances Intercités</h1>
+    <h1>Retards des TGV</h1>
 
     <nav>
-        <a href="index.html">Accueil</a>
-        <a href="page1.html">Intercités</a>
-        <a href="page2.html">TGV</a>
-        <a href="page3.html">Causes</a>
+        <a href="index.html" title="Accueil">Accueil</a>
+        <a href="page1.html" title="Analyse Intercités">Intercités</a>
+        <a href="page3.html" title="Causes des retards">Causes</a>
     </nav>
 
-    <p>
-        blablabla
-    </p>
-
+    <p>Présentation générale des performances TGV et analyse des retards.</p>
     <hr>
 
-    <h2> titre : blablabla</h2>
-    <p>
-        paragraphe : blabla  </p>
-
-    <!-- GRAPH 1 : Retards / annulations -->
-    <div style="width:100%; overflow:hidden;">
-        <iframe src="Graphe_retards_moyen_TGV.html"
-                style="width:130%; height:900px; transform:scale(0.9); transform-origin:top left;">
-        </iframe>
+    <h2>Graphique 1 : Retards / Annulations</h2>
+    <div class="graph-container">
+        <iframe class="graph-iframe" id="graph1" src="Graphe_retards_moyen_TGV.html" title="Graphique Retards / Annulations TGV"></iframe>
     </div>
 
-    <p>
-blablabla
-    </p>
-    <ul style ="text-align:left; font-size:16px;list-style-position:inside;">
-      <li><strong> si besoin </li>
-      <li><strong> si besoin </li>
+    <ul>
+        <li>Point 1 important</li>
+        <li>Point 2 important</li>
     </ul>
-    </p>
-    </p>
 
-
-
-    <h2>titre du deuxieme graphe si il existe </h2>
-    <p> paragraphe blablabla
-    </p>
-
-    <!-- GRAPH 2 : Performance Intercités -->
-    <div style="width:100%; overflow:hidden;">
-        <iframe src="Graphe_retards_moyen_TGV.html"
-                style="width:130%; height:800px; transform:scale(0.75); transform-origin:top left;">
-        </iframe>
+    <h2>Graphique 2 : Performance TGV</h2>
+    <div class="graph-container">
+        <iframe class="graph-iframe" id="graph2" src="Graphe_retards_moyen_TGV.html" title="Graphique Performance TGV"></iframe>
     </div>
-    <h3 style="text-align: left;">Comment interpréter le graphique</h3>
-    <p style="text-align: left; font-size: 16px;">
-balblabla
-    </p>
-    <ul style="text-align: left; font-size: 16px; list-style-position: inside;">
-      <li><strong> si besoin </li>
-      <li><strong> si besoin </li>
-      <li><strong>why not  :</strong> blabla.</li>
-      <li><strong>oui </strong> non</li>
-    </ul>
-    <p style="text-align: left; font-size: 16px;">
-bla
-    </p>
 
-    <h3  style="text-align: left;"> blablabla</h3>
-    <p style="text-align: left; font-size: 16px;">
-blablabla</p>
-
-    <h4 style="text-align: left;">blablabla</h4>
-    <ul style="text-align: left; font-size: 16px; list-style-position: inside;">
-      <li>blablabla</li>
-      <li>blabla</li>
-      <li>blablabla</li>
+    <h3>Comment interpréter le graphique</h3>
+    <ul>
+        <li>Point clé 1</li>
+        <li>Point clé 2</li>
+        <li>Point clé 3</li>
+        <li>Point clé 4</li>
     </ul>
 
-    <h4 style="text-align: left;">bla</h4>
-    <ul style="text-align: left; font-size: 16px; list-style-position: inside;">
-      <li>oui</li>
-      <li>oui </li>
-      <li>oui</li>
+    <h4>Résumé et conclusions</h4>
+    <ul>
+        <li>Conclusion 1</li>
+        <li>Conclusion 2</li>
+        <li>Conclusion 3</li>
     </ul>
 
-    <p style="text-align: left; font-size: 16px;">
-bla
-    </p>
+    <footer>
+        <hr>
+        <p style="text-align:center;">Données SNCF et analyse TGV - © 2025</p>
+    </footer>
+
+    <!-- Script pour ajuster dynamiquement la hauteur des iframes -->
+    <script>
+        function adjustIframeHeight(iframe) {
+            try {
+                // Ajuste la hauteur selon le contenu
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                if (doc) {
+                    iframe.style.height = doc.body.scrollHeight + 'px';
+                }
+            } catch(e) {
+                // Si CORS empêche l'accès, définir une hauteur par défaut
+                iframe.style.height = '800px';
+            }
+        }
+
+        const iframes = document.querySelectorAll('.graph-iframe');
+        iframes.forEach(frame => {
+            frame.addEventListener('load', () => adjustIframeHeight(frame));
+            // Réajustement à chaque redimensionnement de la fenêtre
+            window.addEventListener('resize', () => adjustIframeHeight(frame));
+        });
+    </script>
 
 </body>
 </html>
+
+
