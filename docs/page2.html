@@ -77,7 +77,7 @@
 </head>
 <body>
 
-    <h1>Retards des TGV</h1>
+    <h1>Analyse des performances TGV</h1>
 
     <nav>
         <a href="index.html" title="Accueil">Accueil</a>
@@ -85,28 +85,41 @@
         <a href="page3.html" title="Causes des retards">Causes</a>
     </nav>
 
-    <p>Cette page propose une exploration interactive de la ponctualité et de la fiabilité des trains TGV au départ et à arrivée dans les gares</p>
-    <hr>
+    <p>
+        Cette page propose un graphe de la ponctualité et de la fiabilité des trains TGV au départ et à l'arrivée dans les gares
+    </p>
 
-    <p>Graphique basé sur les gares TVG de Nîmes, Montpellier, Perpignan et Toulouse Matabiau (retard moyen au départ et à l'arrivée)</p>
+    <hr>
+    <p>
+        Graphique basé sur les gares TVG de Nîmes, Montpellier, Perpignan et Toulouse Matabiau (retard moyen au départ et à l'arrivée).
 
     <h2>Graphe du Retard Moyen des TGV</h2>
     <div style="width:100%; overflow:hidden;">
         <iframe src="Graphe_retards_moyen_TGV.html"
-                style="width:100%; height:600px; transform:scale(1); transform-origin:top left bottom right;">
+                style="width:100%; height:600px; transform:scale(0.9); transform-origin:top left;">
         </iframe>
     </div>
 
-    <ul>
-        <li>On remarque que en moyenne les retards au départ est d'environ 3 minute par gare,</li>
-        <li>cependant à l'arrivée le temps de retard varie d'un trajet à l'autre mais reste toujours supérieur à celui du départ.</li>
+    <p>
+Observation:
+    
+    </p>
+    <ul style ="text-align:left; font-size:16px;list-style-position:inside;">
+      <li><strong> On remarque que en moyenne les retards au départ est d'environ 3 minute par gare, </li>
+      <li><strong> cependant à l'arrivée le temps de retard varie d'un trajet à l'autre mais reste toujours supérieur à celui du départ. </li>
     </ul>
 
-    <!--
+<!--
 
-    <h2>Graphique 2 : Performance TGV</h2>
-    <div class="graph-container">
-        <iframe class="graph-iframe" id="graph2" src="Graphe_retards_moyen_TGV.html" title="Graphique Performance TGV"></iframe>
+    <h2>titre du deuxieme graphe si il existe </h2>
+    <p> paragraphe blablabla
+    </p>
+
+     GRAPH 2 : Performance Intercités 
+    <div style="width:100%; overflow:hidden;">
+        <iframe src="Graphe_retards_moyen_TGV.html"
+                style="width:130%; height:800px; transform:scale(0.75); transform-origin:top left;">
+        </iframe>
     </div>
 
     <h3>Comment interpréter le graphique</h3>
@@ -124,36 +137,9 @@
         <li>Conclusion 3</li>
     </ul>
 
-    <footer>
-        <hr>
-        <p style="text-align:center;">Données SNCF et analyse TGV - © 2025</p>
-    </footer>
-
--->
-
-    <!-- Script pour ajuster dynamiquement la hauteur des iframes -->
-     <!--
-    <script>
-        function adjustIframeHeight(iframe) {
-            try {
-                // Ajuste la hauteur selon le contenu
-                const doc = iframe.contentDocument || iframe.contentWindow.document;
-                if (doc) {
-                    iframe.style.height = doc.body.scrollHeight + 'px';
-                }
-            } catch(e) {
-                // Si CORS empêche l'accès, définir une hauteur par défaut
-                iframe.style.height = '800px';
-            }
-        }
-
-        const iframes = document.querySelectorAll('.graph-iframe');
-        iframes.forEach(frame => {
-            frame.addEventListener('load', () => adjustIframeHeight(frame));
-            // Réajustement à chaque redimensionnement de la fenêtre
-            window.addEventListener('resize', () => adjustIframeHeight(frame));
-        });
-    </script>
+    <p style="text-align: left; font-size: 16px;">
+bla
+    </p>
 -->
 
 </body>
