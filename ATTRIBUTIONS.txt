@@ -1,0 +1,32 @@
+ATTRIBUTIONS ET LICENCES DU PROJET
+==================================
+
+1. Code source
+--------------
+Le code développé dans ce projet est sous licence MIT.
+Vous pouvez le réutiliser, le modifier et le redistribuer conformément à la licence MIT.
+
+2. Données GeoJSON des régions françaises
+-----------------------------------------
+Source : https://github.com/gregoiredavid/france-geojson
+Licence : Admin Express / Open Licence 2.0
+Description : Fichier GeoJSON simplifié des régions françaises utilisé pour l'affichage de la carte interactive.
+Remarque : Conformément à la licence, la source est citée et le fichier est utilisé tel quel.
+
+3. Données SNCF
+---------------
+Source : Données publiques SNCF (Admin Express)
+Licence : Open Licence 2.0
+Description : Données sur les trains Intercités et TGV (retards, annulations, circulation) utilisées pour les graphiques et analyses.
+Remarque : Les données sont utilisées à des fins d'analyse et de visualisation uniquement.
+
+4. Bibliothèques et frameworks utilisés
+---------------------------------------
+- Leaflet.js : https://leafletjs.com/ (BSD 2-clause)
+- Chart.js : https://www.chartjs.org/ (MIT)
+
+5. Remarques générales
+---------------------
+- Le code reste sous licence MIT.
+- Les données externes conservent leur licence respective et la source est correctement attribuée.
+- Toute redistribution du projet doit inclure ce fichier ATTRIBUTIONS.txt.
