@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Graphique Nombre de trains Intercités Albi</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Nombre de trains Intercités ayant circulé à Albi</h1>
+  <canvas id="myChart" width="800" height="400"></canvas>
+
+  <script>
+    async function getCSVData(fileName) {
+      const response = await fetch(fileName);
+      if (!response.ok) throw new Error('Erreur chargement CSV local');
+      const text = await response.text();
+
+      const lines = text.split('\n');
+      const headers = lines[0].split(';');
+
+      const data = lines.slice(1)
+                        .filter(line => line.trim() !== '')
+                        .map(line => {
+                          const cols = line.split(';');
+                          const obj = {};
+                          headers.forEach((header, i) => {
+                            obj[header] = cols[i];
+                          });
+                          return obj;
+                        });
+      return data;
+    }
+
+    async function createChart() {
+      try {
+        // Charger le CSV local
+        const data = await getCSVData('albi_retard_arrivee_intercites.csv');
+
+        const labels = data.map(row => row["Date"]);
+        const values = data.map(row => parseFloat(row["Nombre de trains ayant circulé"]));
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Nombre de trains ayant circulé',
+              data: values,
+              borderColor: 'rgba(54, 162, 235, 1)',
+              backgroundColor: 'rgba(54, 162, 235, 0.2)',
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'top' },
+              title: { display: true, text: 'Nombre de trains Intercités ayant circulé par mois' }
+            },
+            scales: {
+              x: { title: { display: true, text: 'Date' } },
+              y: { title: { display: true, text: 'Nombre de trains Intercités' } }
+            }
+          }
+        });
+      } catch (error) {
+        console.error(error);
+        alert('Impossible de charger le CSV local. Vérifie le nom du fichier et son emplacement.');
+      }
+    }
+
+    createChart();
+  </script>
+</body>
+</html>

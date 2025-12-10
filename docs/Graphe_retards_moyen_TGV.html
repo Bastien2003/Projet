@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Retard moyen des TGV</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+
+
+<main>
+    
+
+    
+
+    <canvas id="retardsChart" height="120"></canvas>
+
+    
+</main>
+
+<script>
+// ---------------------------------------------------------------------------
+// Liste des fichiers CSV téléchargés via Pooch
+// ---------------------------------------------------------------------------
+const csvFiles = [
+    "data/nimes_retard_arrivee+depart_tgv.csv",
+    "data/montpellier_retard_arrivee+depart_tgv.csv",
+    "data/perpignan_retard_arrivee+depart_tgv.csv",
+    "data/toulouse_matabiau_retard_arrivee+depart_tgv.csv"
+];
+
+// Noms exacts des colonnes dans les CSV
+const COL_GARE = "Gare de départ";
+const COL_RETARD_DEP = "Retard moyen de tous les trains au départ";
+const COL_RETARD_ARR = "Retard moyen de tous les trains à l'arrivée";
+
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+async function main() {
+    const labels = [];         // Nom des gares (une par fichier)
+    const moyennesDep = [];    // Retard moyen au départ (min)
+    const moyennesArr = [];    // Retard moyen à l'arrivée (min)
+
+    for (const file of csvFiles) {
+        try {
+            const text = await fetchCsv(file);
+            const rows = parseCsv(text, ";");
+            if (rows.length === 0) continue;
+
+            // gare = première ligne de la colonne "Gare de départ",
+            // équivalent à df["Gare de départ"].iloc[0] en Python
+            const gare = rows[0][COL_GARE] || file;
+
+            const valsDep = [];
+            const valsArr = [];
+
+            // On parcourt toutes les lignes du fichier (comme df[col].mean())
+            rows.forEach(row => {
+                const depStr = row[COL_RETARD_DEP];
+                const arrStr = row[COL_RETARD_ARR];
+
+                if (depStr !== undefined && depStr !== "") {
+                    const vDep = parseFloat(depStr.replace(",", "."));
+                    if (!isNaN(vDep)) valsDep.push(vDep);
+                }
+
+                if (arrStr !== undefined && arrStr !== "") {
+                    const vArr = parseFloat(arrStr.replace(",", "."));
+                    if (!isNaN(vArr)) valsArr.push(vArr);
+                }
+            });
+
+            // Si on a des données, on calcule la moyenne
+            if (valsDep.length > 0 || valsArr.length > 0) {
+                labels.push(gare);
+                moyennesDep.push(moyenne(valsDep));
+                moyennesArr.push(moyenne(valsArr));
+            }
+        } catch (e) {
+            console.error("Erreur lors du chargement de", file, e);
+        }
+    }
+
+    dessinerGraphe(labels, moyennesDep, moyennesArr);
+}
+
+// Charge le contenu d'un CSV (texte brut)
+async function fetchCsv(path) {
+    const response = await fetch(path);
+    if (!response.ok) {
+        throw new Error("HTTP " + response.status + " pour " + path);
+    }
+    return await response.text();
+}
+
+// Parseur CSV simple (séparateur = sep)
+function parseCsv(text, sep) {
+    const lines = text.trim().split(/\r?\n/);
+    if (lines.length < 2) return [];
+
+    const headers = lines[0].split(sep).map(h => h.trim());
+    const rows = [];
+
+    for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        const cols = lines[i].split(sep);
+        const obj = {};
+        headers.forEach((h, idx) => {
+            obj[h] = (cols[idx] || "").trim();
+        });
+        rows.push(obj);
+    }
+    return rows;
+}
+
+// Calcul de la moyenne
+function moyenne(arr) {
+    if (!arr || arr.length === 0) return 0;
+    const sum = arr.reduce((a, b) => a + b, 0);
+    return sum / arr.length;
+}
+
+// Dessin du graphique avec Chart.js
+function dessinerGraphe(labels, dataDep, dataArr) {
+    const ctx = document.getElementById("retardsChart").getContext("2d");
+
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Retard moyen au départ (min)",
+                    data: dataDep
+                },
+                {
+                    label: "Retard moyen à l'arrivée (min)",
+                    data: dataArr
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: "Minutes"
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: "Gare"
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            const v = context.parsed.y;
+                            return context.dataset.label + ": " + v.toFixed(2) + " min";
+                        }
+                    }
+                },
+                legend: {
+                    position: "top"
+                },
+                title: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Lancer le script une fois la page chargée
+main();
+</script>
+
+</body>
+</html>
