@@ -21,7 +21,7 @@ language = 'fr'
 import os
 import sys
 sys.path.insert(0, r'C:\Users\neore\OneDrive\Bureau\M1\Projet\roadmap\1erSite')
-
+sys.path.insert(0, r"C:\Users\SCD-UM\Documents\dev")
 # -- Options for HTML output -------------------------------------------------
 html_theme = 'sphinx_rtd_theme'  # joli thème
 html_static_path = ['_static']
