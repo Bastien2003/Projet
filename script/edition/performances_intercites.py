@@ -1,5 +1,5 @@
 """
-Module d'analyse des performances du réseau Intercités en Occitanie.
+Module d'analyse des performances du réseau Intercités dans le Sud Ouest.
 
 Ce script :
 - charge les données ferroviaires depuis plusieurs fichiers CSV via `load_all_data()`,
@@ -14,6 +14,17 @@ import pandas as pd
 import plotly.express as px
 from data_loader import DataLoader
 
+import time
+import psutil
+import os
+
+# Avant l'exécution
+process = psutil.Process(os.getpid())
+mem_avant = process.memory_info().rss / 1024 / 1024  # Mo
+
+# Début du chronomètre
+start_time = time.time()
+
 
 # Chargement des données via la nouvelle classe
 loader = DataLoader()
@@ -25,9 +36,9 @@ data_dict = {k: df for k, df in all_data.items() if "intercites" in k}
 #Vérification qu'on a bien chargé des données
 if not data_dict:
     raise ValueError("Aucune donnée 'intercites' trouvée")
-#-------------------------------------
+
 # Nettoyage spécifique pour chaque fichier
-#-------------------------------------
+
 """
 Ce bloc :
 - standardise les noms de colonnes,
@@ -62,7 +73,7 @@ df_complet = pd.concat(data_dict.values(), ignore_index=True)
 # Standardisation des noms de colonnes
 df_complet.columns = df_complet.columns.str.strip()
 
-# Mapping des colonnes - version simplifiée
+# Mapping des colonnes
 mapping_colonnes = {
     'Date': 'Date',
     'Départ': 'Départ',
@@ -105,22 +116,22 @@ for col in colonnes_numeriques:
         df_filtre[col] = pd.to_numeric(df_filtre[col], errors='coerce')
 
 # Afficher les relations uniques pour vérifier
-print("\n=== RELATIONS UNIQUES DÉPART -> ARRIVÉE ===")
+print("\n RELATIONS UNIQUES DÉPART -> ARRIVÉE")
 relations_uniques = df_filtre[['Départ', 'Arrivée']].drop_duplicates()
 print(relations_uniques.sort_values(['Départ', 'Arrivée']).to_string())
 
 # Compter les occurrences
-print("\n=== NOMBRE DE RELATIONS PAR GARE DE DÉPART ===")
+print("\n NOMBRE DE RELATIONS PAR GARE DE DÉPART ===")
 depart_counts = df_filtre['Départ'].value_counts()
 print(depart_counts)
 
-print("\n=== NOMBRE DE RELATIONS PAR GARE D'ARRIVÉE ===")
+print("\n NOMBRE DE RELATIONS PAR GARE D'ARRIVÉE")
 arrivee_counts = df_filtre['Arrivée'].value_counts()
 print(arrivee_counts)
 
-# ----------------------------
+
 # Agrégation et calcul des taux
-# ----------------------------
+
 """
 Ce bloc :
 - agrège les données par relation Départ -> Arrivée,
@@ -154,15 +165,14 @@ df_summary = df_summary[
 ]
 
 # VÉRIFICATION FINALE DES DONNÉES
-print("\n=== DONNÉES AGRÉGÉES POUR VISUALISATION ===")
 print(f"Nombre total de relations: {len(df_summary)}")
 print(f"Gares de départ uniques: {df_summary['Départ'].nunique()}")
 print(f"Gares d'arrivée uniques: {df_summary['Arrivée'].nunique()}")
 
 
-# ----------------------------
+
 # Visualisation avec Plotly
-# ----------------------------
+
 """
 Ce bloc :
 - crée un scatter plot interactif avec Plotly Express,
@@ -175,11 +185,11 @@ fig = px.scatter(
     x='Trains_programmés',
     y='Taux_régularité',
     size='Trains_retard',
-    color='Départ',  # Maintenant Départ est correct
+    color='Départ',  
     hover_name='Arrivée',
     custom_data=['Départ', 'Trains_programmés', 'Trains_circulés', 'Taux_régularité', 
                  'Trains_retard', 'Trains_annulés', 'Taux_annulation', 'Taux_retard'],
-    title='Analyse de Performance du Réseau Intercités d\'Occitanie<br><sub>Taille = Nombre de retards | Couleur = Gare de départ</sub>',
+    title='Analyse de Performance du Réseau Intercités du Sud Ouest<br><sub>Taille = Nombre de retards | Couleur = Gare de départ</sub>',
     labels={
         'Trains_programmés': 'Trains Programmes (total)',
         'Taux_régularité': 'Taux de Régularité SNCF (%)',
@@ -221,3 +231,12 @@ fig.update_traces(
 
 # Affichage
 fig.show()
+
+# Après l'exécution
+mem_apres = process.memory_info().rss / 1024 / 1024  # Mo
+print(f"Mémoire utilisée : {mem_apres - mem_avant:.2f} Mo")
+
+end_time = time.time()
+execution_time = end_time - start_time
+
+print(f"Temps d'exécution : {execution_time:.2f} secondes")

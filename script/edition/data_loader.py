@@ -3,7 +3,7 @@ import pandas as pd
 
 class DataLoader:
     """
-    Classe pour télécharger et charger les données ferroviaires Intercités et TGV.
+    Classe pour télécharger et charger les données ferroviaires
 
     Attributs
     ---------

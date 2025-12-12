@@ -1,5 +1,5 @@
 """
-Application Dash permettant d’analyser les retards des trains Intercités en Occitanie.
+Application Dash permettant d’analyser les retards des trains Intercités dans le Sud Ouest.
 
 Ce module :
 - charge les données ferroviaires issues de plusieurs fichiers CSV,
@@ -16,6 +16,16 @@ from dash import dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
 from data_loader import DataLoader
 
+import time
+import psutil
+import os
+
+# Avant l'exécution
+process = psutil.Process(os.getpid())
+mem_avant = process.memory_info().rss / 1024 / 1024  # Mo
+
+# Début du chronomètre
+start_time = time.time()
 
 loader=DataLoader()
 data_dict = loader.load_all_data()
@@ -130,7 +140,7 @@ def get_available_years(df, ville, gare=None):
 
 # Layout
 app.layout = dbc.Container([
-    html.H1("Analyse des retards ferroviaires - Occitanie", className="text-center my-4"),
+    html.H1("Analyse des retards ferroviaires - Sud Ouest", className="text-center my-4"),
 
     dbc.Row([
         dbc.Col([
@@ -341,8 +351,8 @@ def update_graphique(ville, gare, annee):
     data = data.sort_values('Date_complete')
     # Construire la figure
     fig = go.Figure()
-    pastel_retard = '#FFE3AA'
-    pastel_annule = '#FFD1DC'
+    pastel_retard = '#FFC966'
+    pastel_annule = '#D4A5A5'
     pastel_programme = '#B5EAD7'
     pastel_circule = '#2E86AB'
     fig.add_trace(go.Bar(x=data['Date_complete'], y=data[COLONNE_RETARD], name='Trains en retard'))
@@ -362,6 +372,16 @@ def update_graphique(ville, gare, annee):
 
     return fig
 
+
+end_time = time.time()
+execution_time = end_time - start_time
+
+# Après l'exécution
+mem_apres = process.memory_info().rss / 1024 / 1024  # Mo
+end_time = time.time()
+execution_time = end_time - start_time
+print(f"Mémoire utilisée : {mem_apres - mem_avant:.2f} Mo")
+print(f"Temps d'exécution : {execution_time:.2f} secondes")
 
 if __name__ == '__main__':
     """Point d'entrée de l'application : lance le serveur Dash en mode debug."""

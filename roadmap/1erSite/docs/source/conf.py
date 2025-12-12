@@ -17,13 +17,15 @@ exclude_patterns = []
 
 language = 'fr'
 
-# Ajouter le chemin vers ton projet pour autodoc
+# Ajouter le chemin vers les dossiers contenant les modules Python
 import os
 import sys
-sys.path.insert(0, r'C:\Users\neore\OneDrive\Bureau\M1\Projet\roadmap\1erSite')
+
+# Pour data_fetcher.py
+sys.path.insert(0, r"C:\Users\neore\OneDrive\Bureau\M1\Projet\roadmap\1erSite")
+# Pour data_loader.py et les autres modules dans script/edition
+sys.path.insert(0, r"C:\Users\neore\OneDrive\Bureau\M1\Projet\script\edition")
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = 'sphinx_rtd_theme'  # joli thème
 html_static_path = ['_static']
-
-
