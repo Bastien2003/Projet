@@ -1,0 +1,179 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="fr" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_loader &mdash; Documentation Projet 1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7a28dfa3"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/translations.js?v=e6b791cb"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Recherche" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Projet
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Rechercher docs" aria-label="Rechercher docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Projet</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Code du module</a></li>
+      <li class="breadcrumb-item active">data_loader</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Code source de data_loader</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pooch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<div class="viewcode-block" id="DataLoader">
+<a class="viewcode-back" href="../index.html#data_loader.DataLoader">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataLoader</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Classe pour télécharger et charger les données ferroviaires</span>
+
+<span class="sd">    Attributs</span>
+<span class="sd">    ---------</span>
+<span class="sd">    urls : dict</span>
+<span class="sd">        Dictionnaire nom -&gt; URL des fichiers CSV.</span>
+<span class="sd">    data_dict : dict</span>
+<span class="sd">        Dictionnaire nom -&gt; DataFrame chargé.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Dictionnaire des fichiers et URLs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">urls</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;albi_intercites&quot;</span><span class="p">:</span> <span class="s2">&quot;https://drive.google.com/uc?export=download&amp;id=1sOx07CWnSI4uF-EbekytHxp7pM-efv1T&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;bayonne_intercites&quot;</span> <span class="p">:</span> <span class="s2">&quot;https://drive.google.com/uc?export=download&amp;id=1NmcPWkFA0oyWByA0qzFfDCmeAwGK26-W&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;beziers_intercites&quot;</span> <span class="p">:</span> <span class="s2">&quot;https://drive.google.com/uc?export=download&amp;id=1UWqKtoOyDCjLX1VJ6ZmAW-wIMXGkL-y7&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;latour_de_carol_intercites&quot;</span> <span class="p">:</span> <span class="s2">&quot;https://drive.google.com/uc?export=download&amp;id=1foFmCtiKbj9B6lq0ILwNQ6ZCa984LBqV&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;liste_des_gares&quot;</span> <span class="p">:</span> <span class="s2">&quot;https://drive.google.com/uc?export=download&amp;id=1Ykru6rmhBiL2X6w8x2DN_O8e2T75hbPs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;liste_gares_occitanie&quot;</span> <span class="p">:</span> <span class="s2">&quot;https://drive.google.com/uc?export=download&amp;id=1AcqdNzwO6k7Q5pH0gB1aoU63-D-QA2a0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;montpellier_tgv&quot;</span> <span class="p">:</span> <span class="s2">&quot;https://drive.google.com/uc?export=download&amp;id=1FiJxM43xx25_LXExDXkDieBViMwmrRN7&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nimes_intercites&quot;</span> <span class="p">:</span> <span class="s2">&quot;https://drive.google.com/uc?export=download&amp;id=1U-bejnzcD0pcff57-j0sA4bw-0VX4g75&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nimes_tgv&quot;</span> <span class="p">:</span> <span class="s2">&quot;https://drive.google.com/uc?export=download&amp;id=1DTDlzaO5dsXJa8dpaDfYJ2YfZlS5VoWH&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;perpigan_tgv&quot;</span> <span class="p">:</span> <span class="s2">&quot;https://drive.google.com/uc?export=download&amp;id=11hzTpFsX2UnF0X1Sm9j8YzRa_PJyF6V2&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tarbes_intercites&quot;</span> <span class="p">:</span><span class="s2">&quot;https://drive.google.com/uc?export=download&amp;id=17LmGs782zTpTnC7jw4eQoEQ-QnUipyMI&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;toulouse_intercites&quot;</span> <span class="p">:</span> <span class="s2">&quot;https://drive.google.com/uc?export=download&amp;id=1sL1GmwBQwLXLQGpnRXg5vwJZ4AjC7cMn&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;toulouse_tgv&quot;</span> <span class="p">:</span> <span class="s2">&quot;https://drive.google.com/uc?export=download&amp;id=14mtGuOHL9T5S5DTch7wnKAOAMkPj6k5F&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cerbere_intercites&quot;</span> <span class="p">:</span> <span class="s2">&quot;https://drive.google.com/uc?export=download&amp;id=17aNXrns0-ncTSs1BZ6EGYUy3TIZJD7Jd&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="DataLoader.load_all_data">
+<a class="viewcode-back" href="../index.html#data_loader.DataLoader.load_all_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_all_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Télécharge et charge tous les fichiers CSV listés dans self.urls.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Dictionnaire nom -&gt; pandas.DataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">urls</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">pooch</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">known_hash</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+                    <span class="n">filename</span><span class="p">,</span>
+                    <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span>
+                    <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span>
+                    <span class="n">on_bad_lines</span><span class="o">=</span><span class="s1">&#39;skip&#39;</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Erreur lecture du fichier </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dict</span></div>
+
+
+<div class="viewcode-block" id="DataLoader.get_data">
+<a class="viewcode-back" href="../index.html#data_loader.DataLoader.get_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Récupère un DataFrame spécifique par son nom.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Nom du fichier souhaité.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pandas.DataFrame ou None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Droits d'auteur 2025, Regnat.</p>
+  </div>
+
+  Compilé avec <a href="https://www.sphinx-doc.org/">Sphinx</a> en utilisant un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">thème</a>
+    fourni par <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

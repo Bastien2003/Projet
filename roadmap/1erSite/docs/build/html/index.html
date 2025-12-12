@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="fr" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projet &mdash; Documentation Projet 1.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7a28dfa3"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=e6b791cb"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Recherche" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            Projet
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Rechercher docs" aria-label="Rechercher docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Projet</a><ul>
+<li><a class="reference internal" href="#data_fetcher.get_csv"><code class="docutils literal notranslate"><span class="pre">get_csv()</span></code></a></li>
+<li><a class="reference internal" href="#data_loader.DataLoader"><code class="docutils literal notranslate"><span class="pre">DataLoader</span></code></a><ul>
+<li><a class="reference internal" href="#data_loader.DataLoader.get_data"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_data()</span></code></a></li>
+<li><a class="reference internal" href="#data_loader.DataLoader.load_all_data"><code class="docutils literal notranslate"><span class="pre">DataLoader.load_all_data()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#code_graph_interactif_retard_annulation_intercite.get_available_years"><code class="docutils literal notranslate"><span class="pre">get_available_years()</span></code></a></li>
+<li><a class="reference internal" href="#code_graph_interactif_retard_annulation_intercite.update_annee"><code class="docutils literal notranslate"><span class="pre">update_annee()</span></code></a></li>
+<li><a class="reference internal" href="#code_graph_interactif_retard_annulation_intercite.update_gare"><code class="docutils literal notranslate"><span class="pre">update_gare()</span></code></a></li>
+<li><a class="reference internal" href="#code_graph_interactif_retard_annulation_intercite.update_graphique"><code class="docutils literal notranslate"><span class="pre">update_graphique()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Projet</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Projet</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> Afficher la source de la page</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="projet">
+<h1>Projet<a class="headerlink" href="#projet" title="Lien vers cette rubrique"></a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<dl class="py function" id="module-data_fetcher">
+<dt class="sig sig-object py" id="data_fetcher.get_csv">
+<span class="sig-prename descclassname"><span class="pre">data_fetcher.</span></span><span class="sig-name descname"><span class="pre">get_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/data_fetcher.html#get_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_fetcher.get_csv" title="Lien vers cette définition"></a></dt>
+<dd><p>Retourne le chemin local du CSV téléchargé ou mis en cache.</p>
+</dd></dl>
+
+<dl class="py class" id="module-data_loader">
+<dt class="sig sig-object py" id="data_loader.DataLoader">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_loader.</span></span><span class="sig-name descname"><span class="pre">DataLoader</span></span><a class="reference internal" href="_modules/data_loader.html#DataLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_loader.DataLoader" title="Lien vers cette définition"></a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Classe pour télécharger et charger les données ferroviaires</p>
+<section id="attributs">
+<h2>Attributs<a class="headerlink" href="#attributs" title="Lien vers cette rubrique"></a></h2>
+<dl class="simple">
+<dt>urls<span class="classifier">dict</span></dt><dd><p>Dictionnaire nom -&gt; URL des fichiers CSV.</p>
+</dd>
+<dt>data_dict<span class="classifier">dict</span></dt><dd><p>Dictionnaire nom -&gt; DataFrame chargé.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_loader.DataLoader.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_loader.html#DataLoader.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_loader.DataLoader.get_data" title="Lien vers cette définition"></a></dt>
+<dd><p>Récupère un DataFrame spécifique par son nom.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Lien vers cette rubrique"></a></h3>
+<dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>Nom du fichier souhaité.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Lien vers cette rubrique"></a></h3>
+<p>pandas.DataFrame ou None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_loader.DataLoader.load_all_data">
+<span class="sig-name descname"><span class="pre">load_all_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_loader.html#DataLoader.load_all_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_loader.DataLoader.load_all_data" title="Lien vers cette définition"></a></dt>
+<dd><p>Télécharge et charge tous les fichiers CSV listés dans self.urls.</p>
+<section id="id1">
+<h3>Returns<a class="headerlink" href="#id1" title="Lien vers cette rubrique"></a></h3>
+<dl class="simple">
+<dt>dict</dt><dd><p>Dictionnaire nom -&gt; pandas.DataFrame</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<p id="module-performances_intercites">Module d’analyse des performances du réseau Intercités dans le Sud Ouest.</p>
+<p>Ce script :
+- charge les données ferroviaires depuis plusieurs fichiers CSV via <cite>load_all_data()</cite>,
+- filtre et nettoie les données spécifiques aux lignes Intercités,
+- corrige les colonnes “Départ” et “Arrivée” selon certaines règles métier,
+- agrège les données par relation Départ -&gt; Arrivée,
+- calcule des indicateurs tels que le taux de retard et d’annulation,
+- génère un scatter plot interactif avec Plotly pour visualiser la performance des lignes.</p>
+<p id="module-code_graph_interactif_retard_annulation_intercite">Application Dash permettant d’analyser les retards des trains Intercités dans le Sud Ouest.</p>
+<p>Ce module :
+- charge les données ferroviaires issues de plusieurs fichiers CSV,
+- nettoie et fusionne les tableaux,
+- construit une interface Dash composée de dropdowns et d’un graphique dynamique,
+- met à jour les visualisations en fonction des choix de l’utilisateur.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="code_graph_interactif_retard_annulation_intercite.get_available_years">
+<span class="sig-prename descclassname"><span class="pre">code_graph_interactif_retard_annulation_intercite.</span></span><span class="sig-name descname"><span class="pre">get_available_years</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ville</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gare</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/code_graph_interactif_retard_annulation_intercite.html#get_available_years"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#code_graph_interactif_retard_annulation_intercite.get_available_years" title="Lien vers cette définition"></a></dt>
+<dd><p>retourne la liste des années disponibles pour une ville et eventuellement une gare
+Paramètres
+———-
+df : pandas.DataFrame</p>
+<blockquote>
+<div><p>Le DataFrame contenant l’ensemble des données ferroviaires.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>ville<span class="classifier">str</span></dt><dd><p>La ville sélectionnée dans l’interface utilisateur.</p>
+</dd>
+<dt>gare<span class="classifier">str, optionnel</span></dt><dd><p>La gare de départ sélectionnée. Si None, toutes les gares de la ville sont considérées.</p>
+</dd>
+</dl>
+<section id="retour">
+<h2>Retour<a class="headerlink" href="#retour" title="Lien vers cette rubrique"></a></h2>
+<dl class="simple">
+<dt>list[int]</dt><dd><p>Liste triée (ordre décroissant) des années disponibles pour la combinaison ville/gare.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_graph_interactif_retard_annulation_intercite.update_annee">
+<span class="sig-prename descclassname"><span class="pre">code_graph_interactif_retard_annulation_intercite.</span></span><span class="sig-name descname"><span class="pre">update_annee</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ville</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gare</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/code_graph_interactif_retard_annulation_intercite.html#update_annee"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#code_graph_interactif_retard_annulation_intercite.update_annee" title="Lien vers cette définition"></a></dt>
+<dd><p>Met à jour le dropdown des années disponibles en fonction de la ville et de la gare.</p>
+<p>Cette fonction détermine quelles années sont disponibles pour la combinaison
+ville + gare, et génère dynamiquement le composant Dash correspondant.</p>
+<section id="parametres">
+<h2>Paramètres<a class="headerlink" href="#parametres" title="Lien vers cette rubrique"></a></h2>
+<dl class="simple">
+<dt>ville<span class="classifier">str</span></dt><dd><p>La ville sélectionnée.</p>
+</dd>
+<dt>gare<span class="classifier">str|None</span></dt><dd><p>La gare sélectionnée ou None si non applicable.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h2>Retour<a class="headerlink" href="#id2" title="Lien vers cette rubrique"></a></h2>
+<dl class="simple">
+<dt>list|dash.html.Div</dt><dd><p>Composants Dash affichant soit le dropdown d’années, soit un message
+d’indisponibilité si aucune donnée n’est trouvée.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_graph_interactif_retard_annulation_intercite.update_gare">
+<span class="sig-prename descclassname"><span class="pre">code_graph_interactif_retard_annulation_intercite.</span></span><span class="sig-name descname"><span class="pre">update_gare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ville</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/code_graph_interactif_retard_annulation_intercite.html#update_gare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#code_graph_interactif_retard_annulation_intercite.update_gare" title="Lien vers cette définition"></a></dt>
+<dd><p>Met à jour le contenu du dropdown des gares en fonction de la ville sélectionnée.</p>
+<p>Cette fonction :
+- récupère les gares disponibles pour la ville,
+- décide si le dropdown doit être affiché, caché ou désactivé,
+- préremplit la valeur si une seule gare existe.</p>
+<section id="id3">
+<h2>Paramètres<a class="headerlink" href="#id3" title="Lien vers cette rubrique"></a></h2>
+<dl class="simple">
+<dt>ville<span class="classifier">str</span></dt><dd><p>La ville sélectionnée.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h2>Retour<a class="headerlink" href="#id4" title="Lien vers cette rubrique"></a></h2>
+<dl class="simple">
+<dt>tuple :</dt><dd><ul class="simple">
+<li><p>options (list[dict]) : liste des options du dropdown des gares,</p></li>
+<li><p>value (str|None) : valeur sélectionnée automatiquement,</p></li>
+<li><p>disabled (bool) : si le dropdown est désactivé,</p></li>
+<li><p>style_dropdown (dict) : style CSS du dropdown,</p></li>
+<li><p>style_container (dict) : style CSS du conteneur.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_graph_interactif_retard_annulation_intercite.update_graphique">
+<span class="sig-prename descclassname"><span class="pre">code_graph_interactif_retard_annulation_intercite.</span></span><span class="sig-name descname"><span class="pre">update_graphique</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ville</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gare</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annee</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/code_graph_interactif_retard_annulation_intercite.html#update_graphique"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#code_graph_interactif_retard_annulation_intercite.update_graphique" title="Lien vers cette définition"></a></dt>
+<dd><p>Génère et met à jour la figure Plotly affichant les performances ferroviaires.</p>
+<p>La fonction :
+- vérifie et complète les selections manquantes (gare ou année),
+- filtre les données selon la ville/gare/année,
+- construit une figure Plotly combinant barres empilées et courbes,
+- gère les cas où aucune donnée n’est disponible.</p>
+<section id="id5">
+<h2>Paramètres<a class="headerlink" href="#id5" title="Lien vers cette rubrique"></a></h2>
+<dl class="simple">
+<dt>ville<span class="classifier">str</span></dt><dd><p>La ville sélectionnée par l’utilisateur.</p>
+</dd>
+<dt>gare<span class="classifier">str|None</span></dt><dd><p>La gare sélectionnée. Peut être None si la ville n’a qu’une seule gare.</p>
+</dd>
+<dt>annee<span class="classifier">int|None</span></dt><dd><p>L’année sélectionnée. Si None, prend la première année disponible.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h2>Retour<a class="headerlink" href="#id6" title="Lien vers cette rubrique"></a></h2>
+<dl class="simple">
+<dt>plotly.graph_objects.Figure</dt><dd><p>La figure représentant les trains programmés, circulés, annulés et en retard.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Droits d'auteur 2025, Regnat.</p>
+  </div>
+
+  Compilé avec <a href="https://www.sphinx-doc.org/">Sphinx</a> en utilisant un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">thème</a>
+    fourni par <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
