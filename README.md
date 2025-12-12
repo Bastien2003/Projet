@@ -9,7 +9,7 @@ Les résultats de cette analyse seront présentés à travers plusieurs visualis
 
 - Les différences entre TGV, Intercités.
 
-- Des graphiques permettant de mieux comprendre les causes et tendances des retards.
+- Des graphiques permettant d'analyser le nombre de voyageurs moyen par gare.
 
 Grâce à des visualisations interactives, des diagrammes et des graphes, ce projet offre une vue complète de la ponctualité ferroviaire en France.
 
@@ -37,10 +37,13 @@ https://bastien2003.github.io/Projet/
 Projet/
 
  ├── data/                
- ├── diagramme/             
+ ├── diagramme/     
+ ├── docs/  # Site Web et pages HTML    
+ ├── graphique_int/     
  ├── image/       
- ├── roadmap/1erSite    # Site web et pages HTML                
- ├── script/                    
+ ├── roadmap/               
+ ├── script/   
+ ├── slide/                 
  ├── tests/ 
 
 
